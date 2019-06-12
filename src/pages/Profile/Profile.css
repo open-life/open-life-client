@@ -1,0 +1,23 @@
+header {
+    background-color: rgb(54, 54, 54);
+    padding-top: 5rem;
+    padding-left: 20rem;
+    padding-right: 20rem;
+}
+
+.info-strip {
+    align-items: flex-end;
+    color: white;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.avatar {
+    height: 200px;
+    width: 200px;
+}
+
+.avatar-image {
+    margin-top: 2rem;
+}
