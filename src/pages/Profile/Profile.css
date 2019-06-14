@@ -10,7 +10,6 @@ header {
     color: white;
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
 }
 
 .avatar {
@@ -20,4 +19,28 @@ header {
 
 .avatar-image {
     margin-top: 2rem;
+}
+
+.name-stats {
+    border-top: 1px solid white;
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+}
+
+.name {
+    margin-left: 2rem;
+}
+
+.stats {
+    display: flex;
+    flex-direction: row;
+    flex-grow: 1;
+    justify-content: flex-end;
+}
+
+.goals {
+    justify-self: end;
 }
