@@ -12,7 +12,7 @@ const Profile: React.FC = () => {
           <div className="name-stats">
             <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
             <div className="stats">
-              <h2 className="is-size-2 has-text-white goals">8 goals</h2>
+              <h2 className="is-size-2 has-text-white goals">6 goals</h2>
             </div>
           </div>
         </section>
@@ -21,6 +21,14 @@ const Profile: React.FC = () => {
       <section className="section">
         <div className="container has-text-centered">
           <h2 className="title is-2">2019 Goals</h2>
+          <div className="box goals-overview">
+            <p>📚 1 book per month</p>
+            <p>🏋️‍♂️ Run & climb twice a week minimum</p>
+            <p>🧗‍♂️ Climb V8</p>
+            <p>🏃‍♂️ Run a 10k</p>
+            <p>💻 Create a profitable project</p>
+            <p>✍️ Write at least once a month</p>
+          </div>
         </div>
       </section>
     </div>

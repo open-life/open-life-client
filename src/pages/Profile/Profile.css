@@ -44,3 +44,9 @@ header {
 .goals {
     justify-self: end;
 }
+
+.goals-overview {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
