@@ -50,3 +50,7 @@ header {
     flex-direction: row;
     justify-content: space-around;
 }
+
+.progress {
+    margin-top: 1rem;
+}

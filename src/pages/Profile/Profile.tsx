@@ -21,13 +21,27 @@ const Profile: React.FC = () => {
       <section className="section">
         <div className="container has-text-centered">
           <h2 className="title is-2">2019 Goals</h2>
-          <div className="box goals-overview">
-            <p>📚 1 book per month</p>
-            <p>🏋️‍♂️ Run & climb twice a week minimum</p>
-            <p>🧗‍♂️ Climb V8</p>
-            <p>🏃‍♂️ Run a 10k</p>
-            <p>💻 Create a profitable project</p>
-            <p>✍️ Write at least once a month</p>
+          <div className="box">
+            <table className="table is-fullwidth">
+              <thead>
+                <tr>
+                  <th>📚 1 book per month</th>
+                  <th>🏋️‍♂️ Run & climb twice a week minimum</th>
+                  <th>🧗‍♂️ Climb V8</th>
+                  <th>🏃‍♂️ Run a 10k</th>
+                  <th>💻 Create a profitable project</th>
+                  <th>✍️ Write at least once a month</th>
+                </tr>
+              </thead>
+              <tbody>
+                <td className="has-text-centered">0/6</td>
+                <td className="has-text-centered">44%</td>
+                <td className="has-text-centered">❌</td>
+                <td className="has-text-centered">❌</td>
+                <td className="has-text-centered">❌</td>
+                <td className="has-text-centered">1/6</td>
+              </tbody>
+            </table>
           </div>
         </div>
       </section>
