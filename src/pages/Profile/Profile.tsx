@@ -31,6 +31,7 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   render() {
+    var LineChart = require("react-chartjs").Line;
     return (
       <div>
         <header>
@@ -63,18 +64,77 @@ export default class Profile extends React.Component<Props, State> {
                   </tr>
                 </thead>
                 <tbody>
-                  <td className="has-text-centered">0/6</td>
-                  <td className="has-text-centered">44%</td>
-                  <td className="has-text-centered">❌</td>
-                  <td className="has-text-centered">❌</td>
-                  <td className="has-text-centered">❌</td>
-                  <td className="has-text-centered">1/6</td>
+                  <tr>
+                    <td className="has-text-centered">0/6</td>
+                    <td className="has-text-centered">44%</td>
+                    <td className="has-text-centered">❌</td>
+                    <td className="has-text-centered">❌</td>
+                    <td className="has-text-centered">❌</td>
+                    <td className="has-text-centered">1/6</td>
+                  </tr>
                 </tbody>
               </table>
             </div>
             <div className="box">
-              <div className="title is-5">Run & climb twice a week minimum</div>
+              <h5 className="title is-5">Run & climb twice a week minimum</h5>
               <div id="daily-tracker"></div>
+            </div>
+            <div className="columns">
+              <div className="column is-half">
+                <div className="box">
+                  <h5 className="title is-5">Projects</h5>
+                  <table className="table is-fullwidth">
+                    <thead>
+                      <tr>
+                        <th>Project</th>
+                        <th>Progress</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Go Climb To</td>
+                        <td>✔️</td>
+                      </tr>
+                      <tr>
+                        <td>Routine</td>
+                        <td>✔️</td>
+                      </tr>
+                      <tr>
+                        <td>Open Life</td>
+                        <td>🚧</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+              <div className="column is-half">
+                <div className="box">
+                  <h5 className="title is-5">📚 Books</h5>
+                  <table className="table is-fullwidth">
+                    <thead>
+                      <tr>
+                        <th>Book</th>
+                        <th>Rating</th>
+                        <th>Progress</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>12 Rules for Life - Jordan Peterson</td>
+                        <td>⭐⭐⭐⭐⭐</td>
+                        <td>📖</td>
+                      </tr>
+                      <tr>
+                        <td>Beyond Good And Evil – Friedrich Nietzsche</td>
+                        <td></td>
+                        <td>⏭️</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div className="box">
             </div>
           </div>
         </section>
