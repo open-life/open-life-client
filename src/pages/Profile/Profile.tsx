@@ -1,6 +1,7 @@
 import React from 'react';
 import SVG from 'svg.js';
 import './Profile.css';
+import Overview from '../../components/Goals/Overview/Overview';
 
 interface Props { };
 interface State { };
@@ -59,30 +60,8 @@ export default class Profile extends React.Component<Props, State> {
         <section className="section">
           <div className="container has-text-centered">
             <h2 className="title is-2">2019 Goals</h2>
-            <div className="box">
-              <table className="table is-fullwidth">
-                <thead>
-                  <tr>
-                    <th>📚 1 book per month</th>
-                    <th>🏋️‍♂️ Run & climb twice a week minimum</th>
-                    <th>🧗‍♂️ Climb V8</th>
-                    <th>🏃‍♂️ Run a 10k</th>
-                    <th>💻 Create a profitable project</th>
-                    <th>✍️ Write at least once a month</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr>
-                    <td className="has-text-centered">0/6</td>
-                    <td className="has-text-centered">44%</td>
-                    <td className="has-text-centered">❌</td>
-                    <td className="has-text-centered">❌</td>
-                    <td className="has-text-centered">❌</td>
-                    <td className="has-text-centered">1/6</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
+            <Overview goals={["📚 1 book per month", "🏋️‍♂️ Run & climb twice a week minimum", "🧗‍♂️ Climb V8", "🏃‍♂️ Run a 10k", "💻 Create a profitable project", "✍️ Write at least once a month"]}
+              status={["0/6", "44%", "❌", "❌", "❌", "1/6"]} />
             <div className="box">
               <h5 className="title is-5">Run & climb twice a week minimum</h5>
               <div id="daily-tracker"></div>
