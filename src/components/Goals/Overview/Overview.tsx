@@ -5,9 +5,9 @@ interface OverviewProps {
     status: string[];
 };
 
-interface State { };
+interface OverviewState { };
 
-export default class Overview extends React.Component<OverviewProps, State> {
+export default class Overview extends React.Component<OverviewProps, OverviewState> {
     render() {
         const goals = this.props.goals.map(g => <th>{g}</th>);
         const status = this.props.status.map(s => <td className="has-text-centered">{s}</td>);
