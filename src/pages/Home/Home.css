@@ -1,9 +1,8 @@
 .log-button {
-    transition: all 0.5s ease 0s;
+    cursor: pointer;
+    transition: all 0.01s ease 0s;
 }
 
-.log-button:hover {
-    box-shadow: 0 5px #666;
-    transform: translateY(4px);
-    cursor: pointer;
+.log-button:active {
+    transform: translateY(1px);
 }
