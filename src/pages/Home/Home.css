@@ -1,0 +1,8 @@
+.log-button {
+    cursor: pointer;
+    transition: all 0.01s ease 0s;
+}
+
+.log-button:active {
+    transform: translateY(1px);
+}
