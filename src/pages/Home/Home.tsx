@@ -8,21 +8,45 @@ interface State { };
 
 export default class Home extends React.Component<Props, State> {
     render() {
-        let logModal = <div className="field has-background-white">
-            <label className="label">Log a goal</label>
-            <div className="control">
-                <input className="input" type="text" placeholder="Text input" />
-            </div>
-            <p className="help">This is a help text</p>
-        </div>;
+        let createModal =
+            <div className="box">
+                <h3 className="title is-3">Create a goal</h3>
+                <div className="field">
+                    <label className="label">Name</label>
+                    <div className="control">
+                        <input className="input" type="text" placeholder="What do you want to accomplish?" />
+                    </div>
+                    <div className="field">
+                        <label className="label">Type</label>
+                        <div className="control">
+                            <div className="select">
+                                <select>
+                                    <option>Habit</option>
+                                    <option>Number</option>
+                                    <option>List</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>;
 
-        let createModal = <div className="field has-background-white">
-            <label className="label">Create a goal</label>
-            <div className="control">
-                <input className="input" type="text" placeholder="Text input" />
-            </div>
-            <p className="help">This is a help text</p>
-        </div>;
+        let logModal =
+            <div className="box">
+                <h3 className="title is-3">Log a goal</h3>
+                <div className="field">
+                    <label className="label">Which goal?</label>
+                    <div className="control">
+                        <div className="select">
+                            <select>
+                                <option>Run/Climb</option>
+                                <option>1 book per month</option>
+                                <option>Climb v8</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>;
 
         return (
             <div className="section">
