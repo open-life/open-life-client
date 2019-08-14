@@ -9,8 +9,16 @@ interface OverviewState { };
 
 export default class Overview extends React.Component<OverviewProps, OverviewState> {
     render() {
-        const goals = this.props.goals.map(g => <th>{g}</th>);
-        const status = this.props.status.map(s => <td className="has-text-centered">{s}</td>);
+        let goals: JSX.Element[];
+        let status: JSX.Element[];
+
+        if (this.props.goals.length !== 0) {
+            goals = this.props.goals.map(g => <th className="has-text-centered" key={g.toString()}>{g}</th>);
+            status = this.props.status.map(s => <td key={Math.random()} className="has-text-centered">{s}</td>);
+        } else {
+            goals = [];
+            status = [];
+        }
 
         return (
             <div className="box">

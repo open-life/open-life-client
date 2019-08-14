@@ -1,7 +1,10 @@
 import React from 'react';
 import SVG from 'svg.js';
+import Goal from '../../../models/Goal';
 
-interface DailyTrackerProps { };
+interface DailyTrackerProps {
+    goal: Goal;
+};
 
 interface DailyTrackerState { };
 
@@ -16,22 +19,29 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
     }
 
     componentDidMount() {
-        this.dailyTracker();
+        this.dailyTracker(this.props.goal.count, this.props.goal.target);
     }
 
-    dailyTracker() {
+    dailyTracker(count: number, target: number) {
         var draw = SVG('daily-tracker').size('100%', '100%');
         let width = draw.parent().offsetWidth;
 
         let x = 0;
         let y = 0;
-        for (var i = 0; i < 365; i++) {
+        for (var i = 0; i < target; i++) {
             if (x + 21 > width) {
                 x = 0;
                 y += 23;
             }
 
-            draw.rect(21, 21).attr({ x: x, y: y });
+            let fill: string;
+            if (i <= count) {
+                fill = '#000'
+            } else {
+                fill = '#d3d3d3';
+            }
+
+            draw.rect(21, 21).attr({ x: x, y: y, fill: fill });
             x = x + 23;
         }
 

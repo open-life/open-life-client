@@ -11,8 +11,8 @@ interface ListState { };
 
 export default class List extends React.Component<ListProps, ListState> {
   render() {
-    const headerColumns = this.props.headers.map(h => <th>{h}</th>);
-    const bodyRows = this.props.rows.map(r => <tr>{r.map(i => <td>{i}</td>)}</tr>);
+    const headerColumns = this.props.headers.map(h => <th key={h}>{h}</th>);
+    const bodyRows = this.props.rows.map(r => <tr key={r.toString()}>{r.map(i => <td key={i.toString()}>{i}</td>)}</tr>);
 
     return (
       <div className="box">

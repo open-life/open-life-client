@@ -4,12 +4,31 @@ import Overview from '../../components/Goals/Overview/Overview';
 import DailyTracker from '../../components/Goals/DailyTracker/DailyTracker';
 import List from '../../components/Goals/List/List';
 import Chart from '../../components/Goals/Chart/Chart';
+import Goal from '../../models/Goal';
+import GoalsService from '../../services/GoalService';
 
 interface Props { };
-interface State { };
+interface State {
+  goals: Goal[]
+};
 
 export default class Profile extends React.Component<Props, State> {
+  constructor(props: Props) {
+    super(props);
+
+    this.state = { goals: [{ name: 'Hello I am goal' }] };
+  }
+
   render() {
+    if (this.state.goals.length === 0) {
+      return <h1>Time to create some goals.</h1>;
+    }
+
+    let habits: JSX.Element[] = [];
+    this.state.goals.forEach(g => {
+      habits.push(<DailyTracker goal={g} />);
+    });
+
     return (
       <div>
         <header>
@@ -30,10 +49,10 @@ export default class Profile extends React.Component<Props, State> {
           <div className="container has-text-centered">
 
             <h2 className="title is-2">2019 Goals</h2>
-            <Overview goals={["📚 1 book per month", "🏋️‍♂️ Run & climb twice a week minimum", "🧗‍♂️ Climb V8", "🏃‍♂️ Run a 10k", "💻 Create a profitable project", "✍️ Write at least once a month"]}
-              status={["0/6", "44%", "❌", "❌", "❌", "1/6"]} />
+            <Overview goals={this.state.goals.map(g => g.name)}
+              status={this.state.goals.map(g => `${g.count}/${g.target}`)} />
 
-            <DailyTracker />
+            {habits}
 
             <div className="columns">
               <div className="column is-half">
@@ -51,5 +70,14 @@ export default class Profile extends React.Component<Props, State> {
         </section>
       </div >
     );
+  }
+
+  componentDidMount() {
+    const goalService = new GoalsService();
+    goalService
+      .loadGoals()
+      .then(goals => {
+        this.setState({ goals });
+      })
   }
 }
