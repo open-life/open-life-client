@@ -1,12 +1,24 @@
 import React from 'react';
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import './Home.css';
 
 interface Props {
     showModal: Function;
 };
-interface State { };
+interface State {
+    startDate: Date;
+};
 
 export default class Home extends React.Component<Props, State> {
+    constructor(props: Props) {
+        super(props);
+
+        this.state = { startDate: new Date(Date.now()) };
+
+        this.handleChange = this.handleChange.bind(this);
+    }
+
     render() {
         let createModal =
             <div className="box">
@@ -26,6 +38,12 @@ export default class Home extends React.Component<Props, State> {
                                     <option>List</option>
                                 </select>
                             </div>
+                        </div>
+                    </div>
+                    <div className="field">
+                        <label className="label">Start Date</label>
+                        <div className="control">
+                            <DatePicker className="input" selected={this.state.startDate} onChange={this.handleChange} />
                         </div>
                     </div>
                 </div>
@@ -68,5 +86,11 @@ export default class Home extends React.Component<Props, State> {
                 </div>
             </div>
         );
+    }
+
+    handleChange(date: Date) {
+        this.setState({
+            startDate: date
+        });
     }
 }

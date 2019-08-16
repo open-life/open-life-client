@@ -6,17 +6,20 @@ import List from '../../components/Goals/List/List';
 import Chart from '../../components/Goals/Chart/Chart';
 import Goal from '../../models/Goal';
 import GoalsService from '../../services/GoalService';
+import { HabitGoal } from '../../models/HabitGoal';
+import GoalOverview from '../../models/GoalOverview';
 
 interface Props { };
 interface State {
-  goals: Goal[]
+  goals: GoalOverview[],
+  habitGoals: HabitGoal[]
 };
 
 export default class Profile extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { goals: [{ name: 'Hello I am goal' }] };
+    this.state = { goals: [], habitGoals: [] };
   }
 
   render() {
@@ -25,7 +28,7 @@ export default class Profile extends React.Component<Props, State> {
     }
 
     let habits: JSX.Element[] = [];
-    this.state.goals.forEach(g => {
+    this.state.habitGoals.forEach(g => {
       habits.push(<DailyTracker goal={g} />);
     });
 
@@ -49,8 +52,8 @@ export default class Profile extends React.Component<Props, State> {
           <div className="container has-text-centered">
 
             <h2 className="title is-2">2019 Goals</h2>
-            <Overview goals={this.state.goals.map(g => g.name)}
-              status={this.state.goals.map(g => `${g.count}/${g.target}`)} />
+            <Overview goals={this.state.goals.map(g => g.Name)}
+              status={this.state.goals.map(g => g.Progress)} />
 
             {habits}
 
@@ -75,9 +78,15 @@ export default class Profile extends React.Component<Props, State> {
   componentDidMount() {
     const goalService = new GoalsService();
     goalService
-      .loadGoals()
+      .loadGoalOverviews()
       .then(goals => {
         this.setState({ goals });
-      })
+      });
+
+    goalService
+      .loadHabitGoals()
+      .then(habitGoals => {
+        this.setState({ habitGoals });
+      });
   }
 }
