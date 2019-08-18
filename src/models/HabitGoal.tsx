@@ -1,6 +1,6 @@
 export class HabitGoal {
     public HabitGoalId!: number;
-    public name!: string;
+    public Name!: string;
     public Target!: number;
     public Logs!: HabitLog[];
 }
