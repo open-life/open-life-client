@@ -50,13 +50,13 @@ export default class Home extends React.Component<Props, State> {
                 <div className="field">
                     <label className="label">Start Date</label>
                     <div className="control">
-                        <DatePicker className="input" selected={this.state.startDate} value={this.state.startDate} onChange={this.startDate} />
+                        <DatePicker className="input" selected={this.state.startDate} onChange={this.startDate} />
                     </div>
                 </div>
                 <div className="field">
                     <label className="label">End Date</label>
                     <div className="control">
-                        <DatePicker className="input" selected={this.state.endDate} value={this.state.endDate} onChange={this.endDate} />
+                        <DatePicker className="input" selected={this.state.endDate} onChange={this.endDate} />
                     </div>
                 </div>
                 <a className="button is-link">Create Goal</a>
