@@ -10,27 +10,49 @@ interface DailyTrackerProps {
 interface DailyTrackerState { };
 
 export default class DailyTracker extends React.Component<DailyTrackerProps, DailyTrackerState> {
+    constructor(props: DailyTrackerProps) {
+        super(props);
+
+        this.buildDaysArray = this.buildDaysArray.bind(this);
+        this.dailyTracker = this.dailyTracker.bind(this);
+    }
     render() {
         return (
             <div className="box">
-                <h5 className="title is-5">Run & climb twice a week minimum</h5>
-                <div id="daily-tracker"></div>
+                <h5 className="title is-5">{this.props.goal.Name}</h5>
+                <div id={this.props.goal.Name.replace(/\s/g, '')}></div>
             </div>
         )
     }
 
     componentDidMount() {
-        this.dailyTracker(this.props.goal.Logs.map(l => {
-            if (l.HabitCompleted) {
-                return 1;
-            } else {
-                return 0;
+        const daysArray = this.buildDaysArray(this.props.goal);
+        this.dailyTracker(daysArray);
+    }
+
+    buildDaysArray(goal: HabitGoal): number[] {
+        let days: number[] = [];
+        let currentDate = goal.StartDate;
+
+        if (goal.Logs && goal.Logs.length !== 0) {
+            for (var i = 0; i < goal.Target; i++) {
+                if (goal.Logs.find(g => g.Date === currentDate && g.HabitCompleted)) {
+                    days.push(1);
+                } else {
+                    days.push(0);
+                }
+
+                currentDate.setDate(currentDate.getDate() + 1);
             }
-        }));
+        } else {
+            days = new Array(goal.Target).fill(0);
+        }
+
+        return days;
     }
 
     dailyTracker(days: number[]) {
-        var draw = SVG('daily-tracker').size('100%', '100%');
+        var draw = SVG(this.props.goal.Name.replace(/\s/g, '')).size('100%', '100%');
         let width = draw.parent().offsetWidth;
 
         let x = 0;

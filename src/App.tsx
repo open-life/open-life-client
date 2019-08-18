@@ -6,6 +6,8 @@ import Profile from './pages/Profile/Profile';
 import Home from './pages/Home/Home';
 import Settings from './pages/Settings/Settings';
 import Modal from './components/Modal/Modal';
+import CreateGoal from './modals/CreateGoal';
+import LogGoal from './modals/LogGoal';
 
 interface AppProps { };
 interface AppState {
@@ -36,12 +38,20 @@ class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  showModal(body: JSX.Element): void {
-    this.setState({ modalActive: true, modal: body });
+  showModal(modalName: string): void {
+    let modal = <div></div>;
+
+    if (modalName === "create") {
+      modal = <CreateGoal />
+    } else if (modalName === "log") {
+      modal = <LogGoal />
+    }
+
+    this.setState({ modalActive: true, modal: modal });
   }
 
   closeModal(): void {
-    this.setState({ modal: <div></div>, modalActive: false });
+    this.setState({ modalActive: false });
   }
 }
 

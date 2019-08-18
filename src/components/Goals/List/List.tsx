@@ -1,30 +1,29 @@
 import React from 'react';
-import ListItem from './models/ListItem';
+import { ListGoal } from '../../../models/ListGoal';
 
 interface ListProps {
-  name: string;
-  headers: string[];
-  rows: Array<string[]>;
+  goal: ListGoal;
 };
 
 interface ListState { };
 
 export default class List extends React.Component<ListProps, ListState> {
   render() {
-    const headerColumns = this.props.headers.map(h => <th key={h}>{h}</th>);
-    const bodyRows = this.props.rows.map(r => <tr key={r.toString()}>{r.map(i => <td key={i.toString()}>{i}</td>)}</tr>);
+
+    const rows = this.props.goal.Items ? this.props.goal.Items.map(i => <tr><td>{i.Name}</td><td>{i.Progress}</td></tr>) : null;
 
     return (
       <div className="box">
-        <h5 className="title is-5">{this.props.name}</h5>
+        <h5 className="title is-5">{this.props.goal.Name}</h5>
         <table className="table is-fullwidth">
           <thead>
             <tr>
-              {headerColumns}
+              <th>Item</th>
+              <th>Progress</th>
             </tr>
           </thead>
           <tbody>
-            {bodyRows}
+            {rows}
           </tbody>
         </table>
       </div>
