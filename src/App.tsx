@@ -8,6 +8,7 @@ import Settings from './pages/Settings/Settings';
 import Modal from './components/Modal/Modal';
 import CreateGoal from './modals/CreateGoal';
 import LogGoal from './modals/LogGoal';
+import GoalService from './services/GoalService';
 
 interface AppProps { };
 interface AppState {
@@ -16,12 +17,16 @@ interface AppState {
 };
 
 class App extends React.Component<AppProps, AppState> {
+  private _dataService: GoalService;
+
   constructor(props: AppProps) {
     super(props);
     this.state = { modal: <div></div>, modalActive: false };
 
     this.showModal = this.showModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
+
+    this._dataService = new GoalService();
   }
 
   render() {
@@ -42,12 +47,15 @@ class App extends React.Component<AppProps, AppState> {
     let modal = <div></div>;
 
     if (modalName === "create") {
-      modal = <CreateGoal />
+      modal = <CreateGoal closeModal={this.closeModal} />
+      this.setState({ modalActive: true, modal: modal });
     } else if (modalName === "log") {
-      modal = <LogGoal />
+      Promise.all([this._dataService.loadHabitGoals(), this._dataService.loadListGoals(), this._dataService.loadNumberGoals()])
+        .then(values => {
+          modal = <LogGoal habitGoals={values[0]} listGoals={values[1]} numberGoals={values[2]} closeModal={this.closeModal} />
+          this.setState({ modalActive: true, modal: modal });
+        });
     }
-
-    this.setState({ modalActive: true, modal: modal });
   }
 
   closeModal(): void {

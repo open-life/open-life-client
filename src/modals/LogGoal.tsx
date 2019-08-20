@@ -1,6 +1,14 @@
 import React, { ChangeEvent } from "react";
+import { HabitGoal } from "../models/HabitGoal";
+import { ListGoal } from "../models/ListGoal";
+import { NumberGoal } from "../models/NumberGoal";
 
-interface Props { };
+interface Props {
+    closeModal: Function;
+    habitGoals: HabitGoal[];
+    listGoals: ListGoal[];
+    numberGoals: NumberGoal[];
+};
 interface State { };
 
 export default class LogGoal extends React.Component<Props, State> {

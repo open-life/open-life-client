@@ -7,7 +7,9 @@ import { NumberGoal } from "../models/NumberGoal";
 import Input from "../components/Input";
 import { ListGoal } from "../models/ListGoal";
 
-interface Props { };
+interface Props {
+    closeModal: Function;
+};
 interface State {
     goalType: string;
     name: string;
@@ -111,5 +113,7 @@ export default class CreateGoal extends React.Component<Props, State> {
             case 'List':
                 this.goalService.postListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount));
         }
+
+        this.props.closeModal();
     }
 }

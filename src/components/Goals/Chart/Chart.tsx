@@ -1,6 +1,5 @@
 import React from 'react';
 import { NumberGoal } from '../../../models/NumberGoal';
-import { throwStatement } from '@babel/types';
 
 interface ChartProps {
     goal: NumberGoal;
