@@ -9,6 +9,7 @@ import { ListGoal } from "../models/ListGoal";
 
 interface Props {
     closeModal: Function;
+    goalService: GoalService;
 };
 interface State {
     goalType: string;
@@ -104,14 +105,15 @@ export default class CreateGoal extends React.Component<Props, State> {
     }
 
     saveGoal() {
+        const service = this.props.goalService;
+
         switch (this.state.goalType) {
             case 'Habit':
-                this.goalService
-                    .postHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate));
+                service.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate));
             case 'Number':
-                this.goalService.postNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                service.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount));
             case 'List':
-                this.goalService.postListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                service.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount));
         }
 
         this.props.closeModal();

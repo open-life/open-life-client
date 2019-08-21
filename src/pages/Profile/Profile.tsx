@@ -11,29 +11,21 @@ import { ListGoal } from '../../models/ListGoal';
 import { number } from 'prop-types';
 import { NumberGoal } from '../../models/NumberGoal';
 
-interface Props { };
-interface State {
+interface Props {
   goals: GoalOverview[];
   habitGoals: HabitGoal[];
   listGoals: ListGoal[];
   numberGoals: NumberGoal[];
 };
+interface State { };
 
 export default class Profile extends React.Component<Props, State> {
-  private goalService: GoalsService;
-
   constructor(props: Props) {
     super(props);
-
-    this.goalService = new GoalsService();
-
-    this.state = { goals: [], habitGoals: [], listGoals: [], numberGoals: [] };
-
-    this.loadAllGoals = this.loadAllGoals.bind(this);
   }
 
   render() {
-    if (this.state.goals.length === 0) {
+    if (this.props.goals.length === 0) {
       return (
         <header>
           <section className="info-strip">
@@ -49,17 +41,17 @@ export default class Profile extends React.Component<Props, State> {
     }
 
     let habitGoals: JSX.Element[] = [];
-    this.state.habitGoals.forEach(g => {
+    this.props.habitGoals.forEach(g => {
       habitGoals.push(<DailyTracker goal={g} />);
     });
 
     let listGoals: JSX.Element[] = [];
-    this.state.listGoals.forEach(g => {
+    this.props.listGoals.forEach(g => {
       listGoals.push(<div className="column is-half"><List goal={g} /></div>);
     });
 
     let numberGoals: JSX.Element[] = [];
-    this.state.numberGoals.forEach(g => {
+    this.props.numberGoals.forEach(g => {
       numberGoals.push(<Chart goal={g} />);
     });
 
@@ -73,7 +65,7 @@ export default class Profile extends React.Component<Props, State> {
             <div className="name-stats">
               <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
               <div className="stats">
-                <h2 className="is-size-2 has-text-white goals">{this.state.goals.length} goals</h2>
+                <h2 className="is-size-2 has-text-white goals">{this.props.goals.length} goals</h2>
               </div>
             </div>
           </section>
@@ -83,8 +75,8 @@ export default class Profile extends React.Component<Props, State> {
           <div className="container has-text-centered">
 
             <h2 className="title is-2">Goals</h2>
-            <Overview goals={this.state.goals.map(g => g.Name)}
-              status={this.state.goals.map(g => g.Progress)} />
+            <Overview goals={this.props.goals.map(g => g.Name)}
+              status={this.props.goals.map(g => g.Progress)} />
 
             {habitGoals}
 
@@ -97,35 +89,5 @@ export default class Profile extends React.Component<Props, State> {
         </section>
       </div>
     );
-  }
-
-  componentDidMount() {
-    this.loadAllGoals();
-  }
-
-  loadAllGoals() {
-    this.goalService
-      .loadGoalOverviews()
-      .then(goals => {
-        this.setState({ goals });
-      });
-
-    this.goalService
-      .loadHabitGoals()
-      .then(habitGoals => {
-        this.setState({ habitGoals });
-      });
-
-    this.goalService
-      .loadListGoals()
-      .then(listGoals => {
-        this.setState({ listGoals });
-      });
-
-    this.goalService
-      .loadNumberGoals()
-      .then(numberGoals => {
-        this.setState({ numberGoals })
-      });
   }
 }

@@ -2,7 +2,8 @@ import { HabitGoal } from '../models/HabitGoal';
 import GoalOverview from '../models/GoalOverview';
 import { NumberGoal } from '../models/NumberGoal';
 import { ListGoal } from '../models/ListGoal';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject, zip } from 'rxjs';
+import { map } from 'rxjs/operators';
 import HttpClient from './HttpClient';
 
 export default class GoalService {
@@ -34,33 +35,62 @@ export default class GoalService {
 
         this._numberGoals = new BehaviorSubject([] as NumberGoal[]);
         this.NumberGoals = this._numberGoals.asObservable();
+
+        this.loadState();
     }
 
-    loadGoalOverviews(): Observable<GoalOverview[]> {
-        return this._httpClient.get<GoalOverview[]>("https://localhost:44343/api/Goals");
+    private loadState(): void {
+        zip(this.loadGoalOverviews(), this.loadHabitGoals(), this.loadListGoals(), this.loadNumberGoals())
+            .subscribe(values => {
+                this._goalOverviews.next(values[0]);
+                this._habitGoals.next(values[1]);
+                this._listGoals.next(values[2]);
+                this._numberGoals.next(values[3]);
+            });
     }
 
-    loadHabitGoals(): Observable<HabitGoal[]> {
-        return this._httpClient.get<HabitGoal[]>("https://localhost:44343/api/HabitGoal");
+    private loadGoalOverviews(): Observable<GoalOverview[]> {
+        return this.load("https://localhost:44343/api/Goals", this._goalOverviews);
     }
 
-    postHabitGoal(habitGoal: HabitGoal): Observable<HabitGoal> {
-        return this._httpClient.post<HabitGoal>("https://localhost:44343/api/HabitGoal", habitGoal);
+    private loadHabitGoals(): Observable<HabitGoal[]> {
+        return this.load("https://localhost:44343/api/HabitGoal", this._habitGoals);
     }
 
-    loadNumberGoals(): Observable<NumberGoal[]> {
-        return this._httpClient.get<NumberGoal[]>("https://localhost:44343/api/NumberGoal");
+    private loadNumberGoals(): Observable<NumberGoal[]> {
+        return this.load("https://localhost:44343/api/NumberGoal", this._numberGoals);
     }
 
-    postNumberGoal(numberGoal: NumberGoal): Observable<NumberGoal> {
-        return this._httpClient.post<NumberGoal>("https://localhost:44343/api/NumberGoal", numberGoal);
+    private loadListGoals(): Observable<ListGoal[]> {
+        return this.load("https://localhost:44343/api/ListGoal", this._listGoals);
     }
 
-    loadListGoals(): Observable<ListGoal[]> {
-        return this._httpClient.get<ListGoal[]>("https://localhost:44343/api/ListGoal");
+    private load<T>(url: string, stateSubject: BehaviorSubject<T>): Observable<T> {
+        return this._httpClient.get<T>(url).pipe(
+            map((response: T) => {
+                stateSubject.next(response);
+                return response;
+            })
+        );
     }
 
-    postListGoal(listGoal: ListGoal): Observable<ListGoal> {
-        return this._httpClient.post<ListGoal>("https://localhost:44343/api/ListGoal", listGoal);
+    saveHabitGoal(habitGoal: HabitGoal): Observable<HabitGoal> {
+        return this.save<HabitGoal>("https://localhost:44343/api/HabitGoal", habitGoal, this._habitGoals);
+    }
+
+    saveNumberGoal(numberGoal: NumberGoal): Observable<NumberGoal> {
+        return this.save<NumberGoal>("https://localhost:44343/api/NumberGoal", numberGoal, this._numberGoals);
+    }
+
+    saveListGoal(listGoal: ListGoal): Observable<ListGoal> {
+        return this.save<ListGoal>("https://localhost:44343/api/ListGoal", listGoal, this._listGoals);
+    }
+
+    private save<T>(url: string, goal: T, stateSubject: BehaviorSubject<T[]>): Observable<T> {
+        let goals = stateSubject.value;
+        goals.push(goal);
+        stateSubject.next(goals);
+
+        return this._httpClient.post<T>(url, goal);
     }
 }

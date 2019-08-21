@@ -5,11 +5,13 @@ import { NumberGoal } from "../models/NumberGoal";
 
 interface Props {
     closeModal: Function;
+
     habitGoals: HabitGoal[];
     listGoals: ListGoal[];
     numberGoals: NumberGoal[];
-};
-interface State { };
+}
+
+interface State { }
 
 export default class LogGoal extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -17,6 +19,12 @@ export default class LogGoal extends React.Component<Props, State> {
     }
 
     render() {
+        let goals: JSX.Element[] = [];
+
+        this.props.habitGoals.forEach(g => goals.push(<option>{g.Name}</option>));
+        this.props.listGoals.forEach(g => goals.push(<option>{g.Name}</option>));
+        this.props.numberGoals.forEach(g => goals.push(<option>{g.Name}</option>));
+
         return (
             <div className="box">
                 <h3 className="title is-3">Log a goal</h3>
@@ -25,9 +33,7 @@ export default class LogGoal extends React.Component<Props, State> {
                     <div className="control">
                         <div className="select">
                             <select>
-                                <option>Run/Climb</option>
-                                <option>1 book per month</option>
-                                <option>Climb v8</option>
+                                {goals}
                             </select>
                         </div>
                     </div>
