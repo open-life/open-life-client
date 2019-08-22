@@ -26,8 +26,14 @@ export class HabitGoal {
 }
 
 export class HabitLog {
-    public HabitLogId!: number;
-    public Date!: Date;
-    public HabitCompleted!: boolean;
+    public HabitLogId: number;
+    public Date: Date;
+    public HabitCompleted: boolean;
+
+    constructor(date: Date, habitCompleted: boolean) {
+        this.HabitLogId = 0;
+        this.Date = date;
+        this.HabitCompleted = habitCompleted;
+    }
 }
 

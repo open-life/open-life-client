@@ -71,7 +71,7 @@ class App extends React.Component<AppProps, AppState> {
       modal = <CreateGoal goalService={this.goalService} closeModal={this.closeModal} />
       this.setState({ modalActive: true, modal: modal });
     } else if (modalName === "log") {
-      modal = <LogGoal habitGoals={this.state.habitGoals} listGoals={this.state.listGoals} numberGoals={this.state.numberGoals} closeModal={this.closeModal} />
+      modal = <LogGoal goalService={this.goalService} habitGoals={this.state.habitGoals} listGoals={this.state.listGoals} numberGoals={this.state.numberGoals} closeModal={this.closeModal} />
       this.setState({ modalActive: true, modal: modal });
     }
   }

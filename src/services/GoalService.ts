@@ -1,7 +1,7 @@
-import { HabitGoal } from '../models/HabitGoal';
+import { HabitGoal, HabitLog } from '../models/HabitGoal';
 import GoalOverview from '../models/GoalOverview';
-import { NumberGoal } from '../models/NumberGoal';
-import { ListGoal } from '../models/ListGoal';
+import { NumberGoal, NumberLog } from '../models/NumberGoal';
+import { ListGoal, ListItem } from '../models/ListGoal';
 import { Observable, BehaviorSubject, zip } from 'rxjs';
 import { map } from 'rxjs/operators';
 import HttpClient from './HttpClient';
@@ -92,5 +92,32 @@ export default class GoalService {
         stateSubject.next(goals);
 
         return this._httpClient.post<T>(url, goal);
+    }
+
+    logHabit(goalId: number, habitLog: HabitLog): Observable<HabitLog> {
+        let goals = this._habitGoals.value;
+        let goal = goals[goals.findIndex(g => g.HabitGoalId === goalId)];
+        goal.Logs.push(habitLog);
+        this._habitGoals.next(goals);
+
+        return this._httpClient.post<HabitLog>("https://localhost:44343/api/HabitLog", habitLog);
+    }
+
+    logListItem(goalId: number, listItem: ListItem): Observable<ListItem> {
+        let goals = this._listGoals.value;
+        let goal = goals[goals.findIndex(g => g.ListGoalId === goalId)];
+        goal.Items.push(listItem);
+        this._listGoals.next(goals);
+
+        return this._httpClient.post<ListItem>("https://localhost:44343/api/ListItem", listItem);
+    }
+
+    logNumber(goalId: number, numberLog: NumberLog): Observable<NumberLog> {
+        let goals = this._numberGoals.value;
+        let goal = goals[goals.findIndex(g => g.NumberGoalId === goalId)];
+        goal.Logs.push(numberLog);
+        this._numberGoals.next(goals);
+
+        return this._httpClient.post<NumberLog>("https://localhost:44343/api/NumberLog", numberLog);
     }
 }
