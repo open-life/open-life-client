@@ -76,11 +76,19 @@ export default class GoalService {
     }
 
     saveNumberGoal(numberGoal: NumberGoal): Observable<NumberGoal> {
-        return this.save<NumberGoal>("https://localhost:44343/api/NumberGoal", numberGoal, this._numberGoals);
+        if (numberGoal.NumberGoalId === 0) {
+            return this.save<NumberGoal>("https://localhost:44343/api/NumberGoal", numberGoal, this._numberGoals);
+        } else {
+            return this._httpClient.put<NumberGoal>(`https://localhost:44343/api/NumberGoal/${numberGoal.NumberGoalId}`, numberGoal);
+        }
     }
 
     saveListGoal(listGoal: ListGoal): Observable<ListGoal> {
-        return this.save<ListGoal>("https://localhost:44343/api/ListGoal", listGoal, this._listGoals);
+        if (listGoal.ListGoalId) {
+            return this.save<ListGoal>("https://localhost:44343/api/ListGoal", listGoal, this._listGoals);
+        } else {
+            return this._httpClient.put<ListGoal>(`https://localhost:44343/api/ListGoal/${listGoal.ListGoalId}`, listGoal);
+        }
     }
 
     private save<T>(url: string, goal: T, stateSubject: BehaviorSubject<T[]>): Observable<T> {
@@ -89,10 +97,6 @@ export default class GoalService {
         stateSubject.next(goals);
 
         return this._httpClient.post<T>(url, goal);
-    }
-
-    private update<T>(url: string, goal: T): Observable<T> {
-
     }
 
     saveHabitLog(habitLog: HabitLog): Observable<HabitGoal> {
