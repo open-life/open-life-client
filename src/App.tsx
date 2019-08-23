@@ -7,7 +7,7 @@ import Home from './pages/Home/Home';
 import Settings from './pages/Settings/Settings';
 import Modal from './components/Modal/Modal';
 import CreateGoal from './modals/CreateGoal';
-import LogGoal from './modals/LogGoal';
+import LogGoal from './modals/Log/LogGoal';
 import GoalOverview from './models/GoalOverview';
 import GoalService from './services/GoalService';
 import { Observable } from 'rxjs';
@@ -82,6 +82,7 @@ class App extends React.Component<AppProps, AppState> {
 
   private loadData(): void {
     const service = this.goalService;
+    service.loadState().subscribe();
 
     this.loadStatePiece<GoalOverview[]>(service.GoalOverViews, 'goalOverviews');
     this.loadStatePiece<HabitGoal[]>(service.HabitGoals, 'habitGoals');

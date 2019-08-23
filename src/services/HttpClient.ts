@@ -26,4 +26,23 @@ export default class HttpClient {
                 return response.json() as Promise<T>;
             }));
     }
+
+    put<T>(url: string, body: T): Observable<T> {
+        return from(fetch(url, {
+            method: 'PUT',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            redirect: 'follow',
+            referrer: 'no-referrer',
+            body: JSON.stringify(body),
+        })
+            .then(response => {
+                return response.json() as Promise<T>;
+            }));
+    }
 }

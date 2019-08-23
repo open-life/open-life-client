@@ -1,10 +1,11 @@
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, SyntheticEvent } from "react";
 
 interface Props {
     name: string;
     label: string;
-    handleChange: (event: ChangeEvent) => void;
     options: string[];
+
+    handleChange: (event: ChangeEvent) => void;
 };
 interface State { };
 
@@ -16,6 +17,7 @@ export default class MultiSelect extends React.Component<Props, State> {
         let options: JSX.Element[] = [];
 
         this.props.options.forEach(o => options.push(<option>{o}</option>));
+        options.unshift(<option></option>);
 
         return (
             <div className="field">

@@ -30,6 +30,6 @@ export class ListItem {
 }
 
 export enum Progress {
-    Completed,
-    InProgress
+    Completed = "Completed",
+    InProgress = "In Progress"
 }
