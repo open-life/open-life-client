@@ -5,6 +5,7 @@ import { Observable } from "rxjs";
 
 interface Props {
     goal: HabitGoal;
+    closeModal: Function;
     save: (habitLog: HabitLog) => Observable<HabitGoal>;
 }
 
@@ -30,12 +31,18 @@ export default class LogHabit extends React.Component<Props, State> {
                         <DatePicker className="input" selected={this.state.date} onChange={this.setDate} />
                     </div>
                 </div>
-                <span className="button is-link" onClick={() => this.props.save(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true))}>Habit Completed</span>
+                <span className="button is-link" onClick={() => this.save()}>Habit Completed</span>
             </div>
         )
     }
 
-    setDate(date: Date) {
+    setDate(date: Date): void {
         this.setState({ date: date });
+    }
+
+    save(): void {
+        this.props.closeModal();
+        this.props.save(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true));
+        this.setState({ date: new Date() });
     }
 }

@@ -49,7 +49,7 @@ export default class LogGoal extends React.Component<Props, State> {
         );
     }
 
-    setGoals() {
+    setGoals(): string[] {
         let goals: string[] = [];
 
         if (this.state.goalType === 'Habit') {
@@ -70,19 +70,19 @@ export default class LogGoal extends React.Component<Props, State> {
             return <div></div>;
         } else if (this.state.goalType === 'Habit') {
             const goal = this.props.habitGoals[this.props.habitGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogHabit goal={goal} save={service.saveHabitLog} />;
+            return <LogHabit goal={goal} closeModal={this.props.closeModal} save={service.saveHabitLog} />;
         } else if (this.state.goalType === 'Number') {
             const goal = this.props.numberGoals[this.props.numberGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogNumber goal={goal} save={service.saveNumberLog} />;
+            return <LogNumber goal={goal} closeModal={this.props.closeModal} save={service.saveNumberLog} />;
         } else if (this.state.goalType === 'List') {
             const goal = this.props.listGoals[this.props.listGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogList goal={goal} save={service.saveListItem} />;
+            return <LogList goal={goal} closeModal={this.props.closeModal} save={service.saveListItem} />;
         }
 
         return <div></div>;
     }
 
-    handleChange(event: ChangeEvent<any>) {
+    handleChange(event: ChangeEvent<any>): void {
         let fieldName = event.target.name;
         let fieldVal = event.target.value;
 

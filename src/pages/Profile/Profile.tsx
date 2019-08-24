@@ -36,17 +36,17 @@ export default class Profile extends React.Component<Props, State> {
 
     let habitGoals: JSX.Element[] = [];
     this.props.habitGoals.forEach(g => {
-      habitGoals.push(<DailyTracker goal={g} />);
+      habitGoals.push(<DailyTracker key={g.HabitGoalId} goal={g} />);
     });
 
     let listGoals: JSX.Element[] = [];
     this.props.listGoals.forEach(g => {
-      listGoals.push(<div className="column is-half"><List goal={g} /></div>);
+      listGoals.push(<div key={g.ListGoalId} className="column is-half"><List goal={g} /></div>);
     });
 
     let numberGoals: JSX.Element[] = [];
     this.props.numberGoals.forEach(g => {
-      numberGoals.push(<Chart goal={g} />);
+      numberGoals.push(<Chart key={g.NumberGoalId} goal={g} />);
     });
 
     return (

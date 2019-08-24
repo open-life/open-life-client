@@ -42,8 +42,6 @@ class App extends React.Component<AppProps, AppState> {
 
     this.appAlive = true;
     this.goalService = new GoalService();
-
-    this.loadData();
   }
 
   render() {
@@ -58,6 +56,10 @@ class App extends React.Component<AppProps, AppState> {
         </Modal>
       </Router>
     );
+  }
+
+  componentDidMount() {
+    this.loadData();
   }
 
   componentWillUnmount() {

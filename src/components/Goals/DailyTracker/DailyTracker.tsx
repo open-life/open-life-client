@@ -15,6 +15,7 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
         this.buildDaysArray = this.buildDaysArray.bind(this);
         this.dailyTracker = this.dailyTracker.bind(this);
     }
+
     render() {
         return (
             <div className="box">
@@ -33,18 +34,12 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
         let days: number[] = [];
         let currentDate = this.removeTime(goal.StartDate);
 
-        console.log("Start date: ", currentDate)
-
         if (goal.Logs && goal.Logs.length !== 0) {
             for (var i = 0; i < goal.Target; i++) {
-
-                console.log("Looking for date: ", currentDate)
                 let log = goal.Logs.find(l => this.compareDates(this.removeTime(l.Date), currentDate) && l.HabitCompleted);
                 if (log) {
-                    console.log("Found log for date: ", log)
                     days.push(1);
                 } else {
-                    console.log("No log found")
                     days.push(0);
                 }
 

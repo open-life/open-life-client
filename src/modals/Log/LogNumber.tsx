@@ -6,6 +6,7 @@ import { Observable } from "rxjs";
 
 interface Props {
     goal: NumberGoal;
+    closeModal: Function;
     save: (numberLog: NumberLog) => Observable<NumberGoal>;
 }
 
@@ -34,19 +35,25 @@ export default class LogNumber extends React.Component<Props, State> {
                     </div>
                 </div>
                 <Input name="goalAmount" label="Amount" placeholder="100" handleChange={this.handleChange} />
-                <span className="button is-link" onClick={() => this.props.save(new NumberLog(this.props.goal.NumberGoalId, this.state.date, this.state.goalAmount))}>Habit Completed</span>
+                <span className="button is-link" onClick={() => this.save()}>Habit Completed</span>
             </div>
         )
     }
 
-    handleChange(event: ChangeEvent<any>) {
+    handleChange(event: ChangeEvent<any>): void {
         let fieldName = event.target.name;
         let fieldVal = event.target.value;
 
         this.setState({ [fieldName]: fieldVal } as Pick<State, any>);
     }
 
-    setDate(date: Date) {
+    setDate(date: Date): void {
         this.setState({ date: date });
+    }
+
+    save(): void {
+        this.props.closeModal();
+        this.props.save(new NumberLog(this.props.goal.NumberGoalId, this.state.date, this.state.goalAmount));
+        this.setState({ date: new Date(), goalAmount: 0 });
     }
 }
