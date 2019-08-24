@@ -84,7 +84,7 @@ export default class CreateGoal extends React.Component<Props, State> {
                     </div>
                 </div>
                 {goalSpecificFields}
-                <a className="button is-link" onClick={() => this.saveGoal()}>Create Goal</a>
+                <span className="button is-link" onClick={() => this.saveGoal()}>Create Goal</span>
             </div>
         );
     }
@@ -110,10 +110,13 @@ export default class CreateGoal extends React.Component<Props, State> {
         switch (this.state.goalType) {
             case 'Habit':
                 service.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate));
+                break;
             case 'Number':
                 service.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                break;
             case 'List':
                 service.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                break;
         }
 
         this.props.closeModal();

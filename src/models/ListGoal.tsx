@@ -22,10 +22,14 @@ export class ListItem {
     public Name: string;
     public Progress: Progress;
 
-    constructor(name: string) {
+    public ListGoalId: number;
+
+    constructor(goalId: number, name: string, progress: Progress) {
+        this.ListGoalId = goalId;
+
         this.ListItemId = 0;
         this.Name = name;
-        this.Progress = Progress.InProgress;
+        this.Progress = progress;
     }
 }
 

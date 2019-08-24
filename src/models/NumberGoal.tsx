@@ -20,7 +20,11 @@ export class NumberLog {
     public Date: Date;
     public Amount: number;
 
-    constructor(date: Date, goalAmount: number) {
+    public NumberGoalId: number;
+
+    constructor(goalId: number, date: Date, goalAmount: number) {
+        this.NumberGoalId = goalId;
+
         this.NumberLogId = 0;
         this.Date = date;
         this.Amount = goalAmount;

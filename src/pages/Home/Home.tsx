@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from 'react';
+import React from 'react';
 import './Home.css';
 
 interface Props {
@@ -7,10 +7,6 @@ interface Props {
 interface State { };
 
 export default class Home extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="section">

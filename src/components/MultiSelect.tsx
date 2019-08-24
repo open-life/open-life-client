@@ -1,4 +1,4 @@
-import React, { ChangeEvent, SyntheticEvent } from "react";
+import React, { ChangeEvent } from "react";
 
 interface Props {
     name: string;
@@ -10,9 +10,6 @@ interface Props {
 interface State { };
 
 export default class MultiSelect extends React.Component<Props, State> {
-    constructor(props: Props) {
-        super(props);
-    }
     render() {
         let options: JSX.Element[] = [];
 

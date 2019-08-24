@@ -35,6 +35,14 @@ export default class GoalService {
 
         this._numberGoals = new BehaviorSubject([] as NumberGoal[]);
         this.NumberGoals = this._numberGoals.asObservable();
+
+        this.loadState = this.loadState.bind(this);
+        this.saveHabitGoal = this.saveHabitGoal.bind(this);
+        this.saveListGoal = this.saveListGoal.bind(this);
+        this.saveNumberGoal = this.saveNumberGoal.bind(this);
+        this.saveHabitLog = this.saveHabitLog.bind(this);
+        this.saveListItem = this.saveListItem.bind(this);
+        this.saveNumberLog = this.saveNumberLog.bind(this);
     }
 
     loadState(): Observable<any> {
@@ -84,7 +92,7 @@ export default class GoalService {
     }
 
     saveListGoal(listGoal: ListGoal): Observable<ListGoal> {
-        if (listGoal.ListGoalId) {
+        if (listGoal.ListGoalId === 0) {
             return this.save<ListGoal>("https://localhost:44343/api/ListGoal", listGoal, this._listGoals);
         } else {
             return this._httpClient.put<ListGoal>(`https://localhost:44343/api/ListGoal/${listGoal.ListGoalId}`, listGoal);
@@ -109,5 +117,29 @@ export default class GoalService {
 
         habitGoal.Logs.push(habitLog);
         return this.saveHabitGoal(habitGoal);
+    }
+
+    saveNumberLog(numberLog: NumberLog): Observable<NumberGoal> {
+        let numberGoals = this._numberGoals.value;
+        let numberGoal = numberGoals[numberGoals.findIndex(g => g.NumberGoalId === numberLog.NumberGoalId)];
+
+        if (!numberGoal.Logs) {
+            numberGoal.Logs = [];
+        }
+
+        numberGoal.Logs.push(numberLog);
+        return this.saveNumberGoal(numberGoal);
+    }
+
+    saveListItem(listItem: ListItem): Observable<ListGoal> {
+        let listGoals = this._listGoals.value;
+        let listGoal = listGoals[listGoals.findIndex(g => g.ListGoalId === listItem.ListGoalId)];
+
+        if (!listGoal.Items) {
+            listGoal.Items = [];
+        }
+
+        listGoal.Items.push(listItem);
+        return this.saveListGoal(listGoal);
     }
 }

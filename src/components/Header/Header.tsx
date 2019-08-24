@@ -6,15 +6,15 @@ const Header: React.FC = () => {
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
             <div className="navbar-brand">
-                <a className="navbar-item" href="https://bulma.io">
+                <a className="navbar-item" href="/">
                     <h1 className="title is-2">Open Life</h1>
                 </a>
 
-                <a role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
+                <span role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
                     <span aria-hidden="true"></span>
-                </a>
+                </span>
             </div>
 
             <div id="navbarBasicExample" className="navbar-menu">
@@ -28,12 +28,12 @@ const Header: React.FC = () => {
             <div className="navbar-end">
                 <div className="navbar-item">
                     <div className="buttons">
-                        <a className="button is-primary">
+                        <span className="button is-primary">
                             <strong>Sign up</strong>
-                        </a>
-                        <a className="button is-light">
+                        </span>
+                        <span className="button is-light">
                             Log in
-                        </a>
+                        </span>
                     </div>
                 </div>
             </div>

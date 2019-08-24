@@ -1,6 +1,5 @@
 import React from 'react';
 import SVG from 'svg.js';
-import Goal from '../../../models/Goal';
 import { HabitGoal } from '../../../models/HabitGoal';
 
 interface DailyTrackerProps {
@@ -32,13 +31,20 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
 
     buildDaysArray(goal: HabitGoal): number[] {
         let days: number[] = [];
-        let currentDate = goal.StartDate;
+        let currentDate = this.removeTime(goal.StartDate);
+
+        console.log("Start date: ", currentDate)
 
         if (goal.Logs && goal.Logs.length !== 0) {
             for (var i = 0; i < goal.Target; i++) {
-                if (goal.Logs.find(g => g.Date === currentDate && g.HabitCompleted)) {
+
+                console.log("Looking for date: ", currentDate)
+                let log = goal.Logs.find(l => this.compareDates(this.removeTime(l.Date), currentDate) && l.HabitCompleted);
+                if (log) {
+                    console.log("Found log for date: ", log)
                     days.push(1);
                 } else {
+                    console.log("No log found")
                     days.push(0);
                 }
 
@@ -49,6 +55,15 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
         }
 
         return days;
+    }
+
+    private removeTime(date: Date): Date {
+        date = new Date(date);
+        return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    }
+
+    private compareDates(date1: Date, date2: Date): boolean {
+        return date1.getTime() === date2.getTime();
     }
 
     dailyTracker(days: number[]) {

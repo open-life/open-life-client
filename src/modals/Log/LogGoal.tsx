@@ -1,9 +1,9 @@
-import React, { ChangeEvent, SyntheticEvent } from "react";
+import React, { ChangeEvent } from "react";
 import GoalService from "../../services/GoalService";
-import MultiSelect from "../components/MultiSelect";
-import { HabitGoal, HabitLog } from "../../models/HabitGoal";
-import { ListGoal, Progress, ListItem } from "../../models/ListGoal";
-import { NumberGoal, NumberLog } from "../../models/NumberGoal";
+import MultiSelect from "../../components/MultiSelect";
+import { HabitGoal } from "../../models/HabitGoal";
+import { ListGoal } from "../../models/ListGoal";
+import { NumberGoal } from "../../models/NumberGoal";
 import LogHabit from "./LogHabit";
 import LogList from "./LogList";
 import LogNumber from "./LogNumber";
@@ -64,17 +64,19 @@ export default class LogGoal extends React.Component<Props, State> {
     }
 
     getLogInputs(): JSX.Element {
+        let service = this.props.goalService;
+
         if (this.state.goalType === '') {
             return <div></div>;
         } else if (this.state.goalType === 'Habit') {
             const goal = this.props.habitGoals[this.props.habitGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogHabit goal={goal} save={new Function} />;
+            return <LogHabit goal={goal} save={service.saveHabitLog} />;
         } else if (this.state.goalType === 'Number') {
             const goal = this.props.numberGoals[this.props.numberGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogNumber goal={goal} save={new Function} />;
+            return <LogNumber goal={goal} save={service.saveNumberLog} />;
         } else if (this.state.goalType === 'List') {
             const goal = this.props.listGoals[this.props.listGoals.findIndex(g => g.Name === this.state.goalName)];
-            return <LogList goal={goal} save={new Function} />;
+            return <LogList goal={goal} save={service.saveListItem} />;
         }
 
         return <div></div>;

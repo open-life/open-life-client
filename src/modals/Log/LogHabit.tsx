@@ -1,21 +1,24 @@
 import React from "react";
 import DatePicker from "react-datepicker";
-import GoalService from "../../services/GoalService";
-import { HabitGoal } from "../../models/HabitGoal";
+import { HabitGoal, HabitLog } from "../../models/HabitGoal";
+import { Observable } from "rxjs";
 
 interface Props {
     goal: HabitGoal;
-    save: Function;
+    save: (habitLog: HabitLog) => Observable<HabitGoal>;
 }
 
 interface State {
-    goalName: string;
     date: Date;
 }
 
 export default class LogHabit extends React.Component<Props, State> {
     constructor(props: Readonly<Props>) {
         super(props);
+
+        this.state = { date: new Date() };
+
+        this.setDate = this.setDate.bind(this);
     }
 
     render() {
@@ -27,7 +30,7 @@ export default class LogHabit extends React.Component<Props, State> {
                         <DatePicker className="input" selected={this.state.date} onChange={this.setDate} />
                     </div>
                 </div>
-                <a className="button is-link" onClick={() => this.props.goalService.logHabit(goalId, new HabitLog(goalId, this.state.date, true))}>Habit Completed</a>
+                <span className="button is-link" onClick={() => this.props.save(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true))}>Habit Completed</span>
             </div>
         )
     }

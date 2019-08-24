@@ -85,7 +85,6 @@ export default class Chart extends React.Component<ChartProps, ChartState> {
         const months = ["January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"];
 
-        let data: number[] = [];
         let dataDictionary: { [key: string]: number } = {};
         let logs = this.props.goal.Logs;
 

@@ -4,11 +4,9 @@ import Overview from '../../components/Goals/Overview/Overview';
 import DailyTracker from '../../components/Goals/DailyTracker/DailyTracker';
 import List from '../../components/Goals/List/List';
 import Chart from '../../components/Goals/Chart/Chart';
-import GoalsService from '../../services/GoalService';
 import { HabitGoal } from '../../models/HabitGoal';
 import GoalOverview from '../../models/GoalOverview';
 import { ListGoal } from '../../models/ListGoal';
-import { number } from 'prop-types';
 import { NumberGoal } from '../../models/NumberGoal';
 
 interface Props {
@@ -20,17 +18,13 @@ interface Props {
 interface State { };
 
 export default class Profile extends React.Component<Props, State> {
-  constructor(props: Props) {
-    super(props);
-  }
-
   render() {
     if (this.props.goals.length === 0) {
       return (
         <header>
           <section className="info-strip">
             <figure className="image avatar">
-              <img className="is-rounded avatar-image" src="/profile.jpg" />
+              <img alt="Profile Pic" className="is-rounded avatar-image" src="/profile.jpg" />
             </figure>
             <div className="name-stats">
               <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
@@ -60,7 +54,7 @@ export default class Profile extends React.Component<Props, State> {
         <header>
           <section className="info-strip">
             <figure className="image avatar">
-              <img className="is-rounded avatar-image" src="/profile.jpg" />
+              <img alt="Profile Pic" className="is-rounded avatar-image" src="/profile.jpg" />
             </figure>
             <div className="name-stats">
               <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
