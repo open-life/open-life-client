@@ -1,8 +1,11 @@
 import React from "react";
 import createAuth0Client from "@auth0/auth0-spa-js";
 import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
+import IAuth0Context from "./IAuth0Context";
 
-const Auth0Context = React.createContext({});
+const context = React.createContext<IAuth0Context | null>(null);
+export const Auth0Provider = context.Provider;
+export const Auth0Consumer = context.Consumer;
 
 interface Auth0Props {
     onRedirectCallback: (state: any) => void;
@@ -17,7 +20,7 @@ interface Auth0State {
     popupOpen: boolean;
 }
 
-export default class Auth0Provider extends React.Component<Auth0Props, Auth0State> {
+export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
     constructor(props: Auth0Props) {
         super(props);
 
@@ -26,13 +29,13 @@ export default class Auth0Provider extends React.Component<Auth0Props, Auth0Stat
 
     render() {
         return (
-            <Auth0Context.Provider value={() => this.getContext()}>
+            <Auth0Provider value={this.getContext()}>
                 {this.props.children}
-            </Auth0Context.Provider>
+            </Auth0Provider>
         );
     }
 
-    getContext(): Object {
+    getContext(): IAuth0Context {
         let isAuthenticated = this.state.isAuthenticated;
         let user = this.state.user;
         let loading = this.state.loading;
@@ -78,7 +81,7 @@ export default class Auth0Provider extends React.Component<Auth0Props, Auth0Stat
         this.setState({ auth0Client: auth0FromHook, isAuthenticated: isAuthenticated, user: user, loading: false });
     };
 
-    async loginWithPopup(params = {}) {
+    async loginWithPopup(params = {}): Promise<void> {
         this.setState({ popupOpen: true });
         try {
             await this.state.auth0Client.loginWithPopup(params);
