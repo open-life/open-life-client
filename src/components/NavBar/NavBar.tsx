@@ -2,9 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './NavBar.css';
-import Auth0Provider from '../Authentication/Auth0Provider';
-import Auth0Context from '../Authentication/Auth0Context';
-import IAuth0Context from '../Authentication/IAuth0Context';
+import Auth0Context from '../Authentication/Auth0Provider';
 
 interface Props { }
 interface State { }
@@ -39,9 +37,8 @@ export default class NavBar extends React.Component<Props, State>  {
                             <span className="button is-primary">
                                 <strong>Sign up</strong>
                             </span>
-                            <span className="button is-light">
-                                Log in
-                            </span>
+                            {!this.context.isAuthenticated && (<span onClick={() => this.context.loginWithRedirect({})} className="button is-light">Log in</span>)}
+                            {this.context.isAuthenticated && <span onClick={() => this.context.logout()} className="button is-light">Log in</span>}
                         </div>
                     </div>
                 </div>
@@ -49,3 +46,5 @@ export default class NavBar extends React.Component<Props, State>  {
         );
     }
 }
+
+NavBar.contextType = Auth0Context;

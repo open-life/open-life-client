@@ -3,9 +3,9 @@ import createAuth0Client from "@auth0/auth0-spa-js";
 import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
 import IAuth0Context from "./IAuth0Context";
 
-const context = React.createContext<IAuth0Context | null>(null);
-export const Auth0Provider = context.Provider;
-export const Auth0Consumer = context.Consumer;
+export const Auth0Context = React.createContext<IAuth0Context | null>(null);
+export const Auth0Provider = Auth0Context.Provider;
+export const Auth0Consumer = Auth0Context.Consumer;
 
 interface Auth0Props {
     onRedirectCallback: (state: any) => void;

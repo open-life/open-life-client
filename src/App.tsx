@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
 import { BrowserRouter as Router, Route } from 'react-router-dom';
-import Header from './components/Header/Header';
+import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile/Profile';
 import Home from './pages/Home/Home';
 import Settings from './pages/Settings/Settings';
@@ -47,7 +47,7 @@ class App extends React.Component<AppProps, AppState> {
   render() {
     return (
       <Router>
-        <Header />
+        <NavBar />
         <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
         <Route path='/:username' exact render={(props) => <Profile {...props} goals={this.state.goalOverviews} habitGoals={this.state.habitGoals} listGoals={this.state.listGoals} numberGoals={this.state.numberGoals} />} />
         <Route path='/i/settings' exact component={Settings} />
