@@ -1,7 +1,7 @@
 import React from "react";
 import createAuth0Client from "@auth0/auth0-spa-js";
-import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
 import IAuth0Context from "./IAuth0Context";
+import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
 
 export const Auth0Context = React.createContext<IAuth0Context | null>(null);
 export const Auth0Provider = Auth0Context.Provider;
