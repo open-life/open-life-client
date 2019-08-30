@@ -12,13 +12,13 @@
     "chart.js": "^2.5.0",
     "react": "^16.8.6",
     "react-chartjs-2": "^2.7.6",
-    "react-datepicker": "^2.8.0",
+    "react-datepicker": "2.8.0",
     "react-dom": "^16.9.0",
     "react-router-dom": "^5.0.1",
     "react-scripts": "3.0.1",
     "rxjs": "^6.5.2",
     "svg.js": "^2.7.1",
-    "typescript": "3.5.1"
+    "typescript": "3.4.5"
   },
   "scripts": {
     "start": "react-scripts start",

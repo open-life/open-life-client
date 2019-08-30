@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import * as serviceWorker from './serviceWorker';
 import config from "./auth_config.json";
-import Auth0 from './components/Authentication/Auth0Provider';
+import Auth0 from './components/Authentication/Auth0';
 
 const onRedirectCallback = (appState: { targetUrl: string | null | undefined; }) => {
     window.history.replaceState(

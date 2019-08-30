@@ -2,7 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import './NavBar.css';
-import Auth0Context from '../Authentication/Auth0Provider';
+import { Auth0Context } from '../Authentication/Auth0';
 
 interface Props { }
 interface State { }

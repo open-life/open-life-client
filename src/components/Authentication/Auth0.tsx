@@ -2,8 +2,9 @@ import React from "react";
 import createAuth0Client from "@auth0/auth0-spa-js";
 import IAuth0Context from "./IAuth0Context";
 import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
+import { getIdTokenClaimsOptions, Auth0ClientOptions, RedirectLoginOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions, LogoutOptions } from "./Auth0Interfaces";
 
-export const Auth0Context = React.createContext<IAuth0Context | null>(null);
+export const Auth0Context = React.createContext<IAuth0Context>({} as IAuth0Context);
 export const Auth0Provider = Auth0Context.Provider;
 export const Auth0Consumer = Auth0Context.Consumer;
 
@@ -24,7 +25,12 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
     constructor(props: Auth0Props) {
         super(props);
 
-        this.state = { isAuthenticated: false, user: {}, auth0Client: new Auth0Client(this.props.initOptions), loading: true, popupOpen: false };
+        this.state = { isAuthenticated: false, user: {}, auth0Client: {} as Auth0Client, loading: true, popupOpen: false };
+
+        this.getContext = this.getContext.bind(this);
+        this.initAuth0 = this.initAuth0.bind(this);
+        this.loginWithPopup = this.loginWithPopup.bind(this);
+        this.handleRedirectCallback = this.handleRedirectCallback.bind(this);
     }
 
     render() {
