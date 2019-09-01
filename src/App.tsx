@@ -14,9 +14,12 @@ import { HabitGoal } from './models/HabitGoal';
 import { ListGoal } from './models/ListGoal';
 import { NumberGoal } from './models/NumberGoal';
 import { takeWhile } from 'rxjs/operators';
+import { Auth0Context } from './components/Authentication/Auth0';
+import { validate } from '@babel/types';
 
 interface AppProps { };
 interface AppState {
+  dataLoaded: boolean;
   modal: JSX.Element;
   modalActive: boolean;
 
@@ -26,13 +29,13 @@ interface AppState {
   numberGoals: NumberGoal[];
 };
 
-class App extends React.Component<AppProps, AppState> {
+export default class App extends React.Component<AppProps, AppState> {
   private appAlive: boolean;
   private goalService: GoalService;
 
   constructor(props: AppProps) {
     super(props);
-    this.state = { modal: <div></div>, modalActive: false, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
+    this.state = { dataLoaded: false, modal: <div></div>, modalActive: false, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
 
     this.showModal = this.showModal.bind(this);
     this.closeModal = this.closeModal.bind(this);
@@ -62,6 +65,15 @@ class App extends React.Component<AppProps, AppState> {
     }
   }
 
+  componentDidUpdate() {
+    const user = this.context.user;
+    if (user && user.Username && !this.state.dataLoaded) {
+      this.setState({ dataLoaded: true });
+      console.log("User", user);
+      this.loadData(user.Username);
+    }
+  }
+
   componentWillUnmount() {
     this.appAlive = false;
   }
@@ -84,8 +96,8 @@ class App extends React.Component<AppProps, AppState> {
 
   private loadData(username: string): void {
     const service = this.goalService;
-    service.loadUser(username).subscribe();
 
+    service.loadUserGoals(username).subscribe();
     this.loadStatePiece<GoalOverview[]>(service.GoalOverViews, 'goalOverviews');
     this.loadStatePiece<HabitGoal[]>(service.HabitGoals, 'habitGoals');
     this.loadStatePiece<ListGoal[]>(service.ListGoals, 'listGoals');
@@ -95,8 +107,8 @@ class App extends React.Component<AppProps, AppState> {
   private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
     loader
       .pipe(takeWhile(() => this.appAlive))
-      .subscribe(value => this.setState({ [stateKey]: value } as unknown as AppState));
+      .subscribe(value => this.setState({ [stateKey]: value } as unknown as AppState, () => console.log(stateKey + ': ', value)));
   }
 }
 
-export default App;
+App.contextType = Auth0Context;

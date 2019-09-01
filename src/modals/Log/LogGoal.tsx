@@ -26,6 +26,8 @@ export default class LogGoal extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
+        console.log(props);
+
         this.state = { goalName: '', goalType: '' };
 
         this.handleChange = this.handleChange.bind(this);
@@ -52,11 +54,11 @@ export default class LogGoal extends React.Component<Props, State> {
     setGoals(): string[] {
         let goals: string[] = [];
 
-        if (this.state.goalType === 'Habit') {
+        if (this.state.goalType === 'Habit' && this.props.habitGoals) {
             this.props.habitGoals.forEach(g => goals.push(g.Name));
-        } else if (this.state.goalType === 'Number') {
+        } else if (this.state.goalType === 'Number' && this.props.numberGoals) {
             this.props.numberGoals.forEach(g => goals.push(g.Name));
-        } else if (this.state.goalType === 'List') {
+        } else if (this.state.goalType === 'List' && this.props.listGoals) {
             this.props.listGoals.forEach(g => goals.push(g.Name));
         }
 
@@ -68,13 +70,13 @@ export default class LogGoal extends React.Component<Props, State> {
 
         if (this.state.goalType === '') {
             return <div></div>;
-        } else if (this.state.goalType === 'Habit') {
+        } else if (this.state.goalType === 'Habit' && this.props.habitGoals) {
             const goal = this.props.habitGoals[this.props.habitGoals.findIndex(g => g.Name === this.state.goalName)];
             return <LogHabit goal={goal} closeModal={this.props.closeModal} save={service.saveHabitLog} />;
-        } else if (this.state.goalType === 'Number') {
+        } else if (this.state.goalType === 'Number' && this.props.numberGoals) {
             const goal = this.props.numberGoals[this.props.numberGoals.findIndex(g => g.Name === this.state.goalName)];
             return <LogNumber goal={goal} closeModal={this.props.closeModal} save={service.saveNumberLog} />;
-        } else if (this.state.goalType === 'List') {
+        } else if (this.state.goalType === 'List' && this.props.listGoals) {
             const goal = this.props.listGoals[this.props.listGoals.findIndex(g => g.Name === this.state.goalName)];
             return <LogList goal={goal} closeModal={this.props.closeModal} save={service.saveListItem} />;
         }

@@ -119,7 +119,7 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
 
     private setUser(authUser: AuthUser): void {
         const user = this.map(authUser);
-        this._userService.getUser(user.Email)
+        this._userService.getUserWithEmail(user.Email)
             .subscribe(savedUser => {
                 if (!savedUser) {
                     this._userService.saveUser(user)

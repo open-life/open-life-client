@@ -36,7 +36,7 @@ export default class GoalService {
         this._numberGoals = new BehaviorSubject([] as NumberGoal[]);
         this.NumberGoals = this._numberGoals.asObservable();
 
-        this.loadUser = this.loadUser.bind(this);
+        this.loadUserGoals = this.loadUserGoals.bind(this);
         this.saveHabitGoal = this.saveHabitGoal.bind(this);
         this.saveListGoal = this.saveListGoal.bind(this);
         this.saveNumberGoal = this.saveNumberGoal.bind(this);
@@ -45,7 +45,7 @@ export default class GoalService {
         this.saveNumberLog = this.saveNumberLog.bind(this);
     }
 
-    loadUser(username: string): Observable<any> {
+    loadUserGoals(username: string): Observable<any> {
         return zip(this.loadGoalOverviews(username), this.loadHabitGoals(username), this.loadListGoals(username), this.loadNumberGoals(username));
     }
 

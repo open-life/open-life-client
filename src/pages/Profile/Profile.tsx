@@ -14,9 +14,12 @@ import { RouteComponentProps } from 'react-router';
 import { Observable } from 'rxjs';
 import { takeWhile } from 'rxjs/operators';
 import GoalService from '../../services/GoalService';
+import User from '../../models/User';
 
 interface Props extends RouteComponentProps<{ [s: string]: string; }> { };
 interface State {
+  user: User;
+
   goalOverviews: GoalOverview[];
   habitGoals: HabitGoal[];
   listGoals: ListGoal[];
@@ -24,17 +27,19 @@ interface State {
 };
 
 export default class Profile extends React.Component<Props, State> {
-  private appAlive: boolean;
-  private goalService: GoalService;
+  private _appAlive: boolean;
+  private _goalService: GoalService;
+  private _userService: UserService;
   private _profilePicUpload: React.RefObject<HTMLInputElement>;
 
   constructor(props: Props) {
     super(props);
 
-    this.state = { goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
+    this.state = { user: {} as User, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
 
-    this.appAlive = true;
-    this.goalService = new GoalService();
+    this._appAlive = true;
+    this._goalService = new GoalService();
+    this._userService = new UserService();
     this._profilePicUpload = React.createRef();
 
     this.buildHeader = this.buildHeader.bind(this);
@@ -74,7 +79,7 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   buildProfilePic(): JSX.Element {
-    if (this.context.user && (this.context.user.picture === '' || !this.context.user.picture)) {
+    if (this.state.user && (this.state.user.ImageUrl === '' || !this.state.user.ImageUrl)) {
       return (
         <div className="add-avatar-image" onClick={() => this.uploadProfilePic()}>
           <input id="fileInput" type="file" ref={this._profilePicUpload} style={{ display: 'none' }} onChange={this.saveProfilePic} />
@@ -84,7 +89,7 @@ export default class Profile extends React.Component<Props, State> {
         </div>
       );
     } else {
-      return <img alt="Profile Pic" className="is-rounded avatar-image" src={this.context.user.picture} />;
+      return <img alt="Profile Pic" className="is-rounded avatar-image" src={this.state.user.ImageUrl} />;
     }
   }
 
@@ -117,7 +122,7 @@ export default class Profile extends React.Component<Props, State> {
             {profilePic}
           </figure>
           <div className="name-stats">
-            <h2 className="is-size-2 has-text-white name">{this.context.user.name}</h2>
+            <h2 className="is-size-2 has-text-white name">{this.state.user.Name}</h2>
             {this.state.goalOverviews.length !== 0 &&
               <div className="stats">
                 <h2 className="is-size-2 has-text-white goals">{this.state.goalOverviews.length} goals</h2>
@@ -153,13 +158,14 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   componentWillUnmount() {
-    this.appAlive = false;
+    this._appAlive = false;
   }
 
   private loadData(): void {
-    const service = this.goalService;
-    service.loadUser(this.props.match.params.username).subscribe();
+    const service = this._goalService;
+    service.loadUserGoals(this.props.match.params.username).subscribe();
 
+    this.loadStatePiece<User>(this._userService.getUserWithUsername(this.props.match.params.username), 'user');
     this.loadStatePiece<GoalOverview[]>(service.GoalOverViews, 'goalOverviews');
     this.loadStatePiece<HabitGoal[]>(service.HabitGoals, 'habitGoals');
     this.loadStatePiece<ListGoal[]>(service.ListGoals, 'listGoals');
@@ -168,10 +174,10 @@ export default class Profile extends React.Component<Props, State> {
 
   private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
     loader
-      .pipe(takeWhile(() => this.appAlive))
+      .pipe(takeWhile(() => this._appAlive))
       .subscribe(value => {
         if (value !== null) {
-          this.setState({ [stateKey]: value } as unknown as State);
+          this.setState({ [stateKey]: value } as unknown as State, () => console.log(stateKey, value));
         }
       });
   }

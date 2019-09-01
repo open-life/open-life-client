@@ -13,8 +13,8 @@ export default class MultiSelect extends React.Component<Props, State> {
     render() {
         let options: JSX.Element[] = [];
 
-        this.props.options.forEach(o => options.push(<option>{o}</option>));
-        options.unshift(<option></option>);
+        this.props.options.forEach(o => options.push(<option key={o}>{o}</option>));
+        options.unshift(<option key="_theBlankOne"></option>);
 
         return (
             <div className="field">
