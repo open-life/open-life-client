@@ -21,6 +21,19 @@ header {
     margin-top: 2rem;
 }
 
+.add-avatar-image {
+    margin-top: 2rem;
+    height: 200px;
+    width: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 290486px;
+    border: 1px solid #4a4a4a;
+    background-color: #4a4a4a;
+    cursor: pointer;
+}
+
 .name-stats {
     border-top: 1px solid white;
     display: flex;

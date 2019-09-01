@@ -69,6 +69,10 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
         this.initAuth0();
     }
 
+    componentWillUnmount() {
+        this.initAuth0();
+    }
+
     async initAuth0() {
         const auth0FromHook = await createAuth0Client(this.props.initOptions);
 

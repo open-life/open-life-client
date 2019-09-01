@@ -8,6 +8,8 @@ interface Props { }
 interface State { }
 
 export default class NavBar extends React.Component<Props, State>  {
+    static contextType = Auth0Context;
+
     render() {
         return (
             <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -27,24 +29,23 @@ export default class NavBar extends React.Component<Props, State>  {
                     <div className="navbar-start">
                         <Link className="navbar-item" to="/">Home</Link>
                         <Link className="navbar-item" to="/pchaffee">Profile</Link>
-                        <Link className="navbar-item" to="/i/settings">Settings</Link>
                     </div>
                 </div>
 
                 <div className="navbar-end">
                     <div className="navbar-item">
-                        <div className="buttons">
-                            <span className="button is-primary">
-                                <strong>Sign up</strong>
-                            </span>
-                            {!this.context.isAuthenticated && (<span onClick={() => this.context.loginWithRedirect({})} className="button is-light">Log in</span>)}
-                            {this.context.isAuthenticated && <span onClick={() => this.context.logout()} className="button is-light">Log in</span>}
-                        </div>
+                        {!this.context.isAuthenticated && (
+                            <div className="buttons">
+                                <span className="button is-primary">
+                                    <strong>Sign up</strong>
+                                </span>
+                                <span onClick={() => this.context.loginWithRedirect({})} className="button is-light">Log in</span>
+                            </div>
+                        )}
+                        {this.context.isAuthenticated && <div className="buttons"><span onClick={() => this.context.logout()} className="button is-light">Log out</span></div>}
                     </div>
                 </div>
             </nav >
         );
     }
 }
-
-NavBar.contextType = Auth0Context;

@@ -8,6 +8,7 @@ import { HabitGoal } from '../../models/HabitGoal';
 import GoalOverview from '../../models/GoalOverview';
 import { ListGoal } from '../../models/ListGoal';
 import { NumberGoal } from '../../models/NumberGoal';
+import { Auth0Context } from '../../components/Authentication/Auth0';
 
 interface Props {
   goals: GoalOverview[];
@@ -19,15 +20,27 @@ interface State { };
 
 export default class Profile extends React.Component<Props, State> {
   render() {
+    let profilePic: JSX.Element;
+    if (this.context.user && (this.context.user.picture === '' || !this.context.user.picture)) {
+      profilePic =
+        <div className="add-avatar-image">
+          <span className="icon is-large">
+            <i className="fas fa-3x fa-plus-circle" onClick={() => console.log("Pic clicked.")}></i>
+          </span>
+        </div>;
+    } else {
+      profilePic = <img alt="Profile Pic" className="is-rounded avatar-image" src={this.context.user.picture} />;
+    }
+
     if (this.props.goals.length === 0) {
       return (
         <header>
           <section className="info-strip">
             <figure className="image avatar">
-              <img alt="Profile Pic" className="is-rounded avatar-image" src="/profile.jpg" />
+              {profilePic}
             </figure>
             <div className="name-stats">
-              <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
+              <h2 className="is-size-2 has-text-white name">{this.context.user.name}</h2>
             </div>
           </section>
         </header>
@@ -54,10 +67,10 @@ export default class Profile extends React.Component<Props, State> {
         <header>
           <section className="info-strip">
             <figure className="image avatar">
-              <img alt="Profile Pic" className="is-rounded avatar-image" src="/profile.jpg" />
+              {profilePic}
             </figure>
             <div className="name-stats">
-              <h2 className="is-size-2 has-text-white name">Phillip Chaffee</h2>
+              <h2 className="is-size-2 has-text-white name">{this.context.user.name}</h2>
               <div className="stats">
                 <h2 className="is-size-2 has-text-white goals">{this.props.goals.length} goals</h2>
               </div>
@@ -85,3 +98,5 @@ export default class Profile extends React.Component<Props, State> {
     );
   }
 }
+
+Profile.contextType = Auth0Context;

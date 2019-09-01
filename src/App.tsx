@@ -4,7 +4,6 @@ import { BrowserRouter as Router, Route } from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile/Profile';
 import Home from './pages/Home/Home';
-import Settings from './pages/Settings/Settings';
 import Modal from './components/Modal/Modal';
 import CreateGoal from './modals/CreateGoal';
 import LogGoal from './modals/Log/LogGoal';
@@ -50,7 +49,6 @@ class App extends React.Component<AppProps, AppState> {
         <NavBar />
         <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
         <Route path='/:username' exact render={(props) => <Profile {...props} goals={this.state.goalOverviews} habitGoals={this.state.habitGoals} listGoals={this.state.listGoals} numberGoals={this.state.numberGoals} />} />
-        <Route path='/i/settings' exact component={Settings} />
         <Modal Active={this.state.modalActive} closeModal={this.closeModal}>
           {this.state.modal}
         </Modal>
