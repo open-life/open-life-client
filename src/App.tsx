@@ -48,7 +48,7 @@ class App extends React.Component<AppProps, AppState> {
       <Router>
         <NavBar />
         <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
-        <Route path='/:username' exact render={(props) => <Profile {...props} goals={this.state.goalOverviews} habitGoals={this.state.habitGoals} listGoals={this.state.listGoals} numberGoals={this.state.numberGoals} />} />
+        <Route path='/:username' exact render={(props) => <Profile {...props} />} />
         <Modal Active={this.state.modalActive} closeModal={this.closeModal}>
           {this.state.modal}
         </Modal>
@@ -57,7 +57,9 @@ class App extends React.Component<AppProps, AppState> {
   }
 
   componentDidMount() {
-    this.loadData();
+    if (this.context.user) {
+      this.loadData(this.context.user.username);
+    }
   }
 
   componentWillUnmount() {
@@ -80,9 +82,9 @@ class App extends React.Component<AppProps, AppState> {
     this.setState({ modalActive: false });
   }
 
-  private loadData(): void {
+  private loadData(username: string): void {
     const service = this.goalService;
-    service.loadState().subscribe();
+    service.loadUser(username).subscribe();
 
     this.loadStatePiece<GoalOverview[]>(service.GoalOverViews, 'goalOverviews');
     this.loadStatePiece<HabitGoal[]>(service.HabitGoals, 'habitGoals');

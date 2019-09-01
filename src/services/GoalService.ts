@@ -36,7 +36,7 @@ export default class GoalService {
         this._numberGoals = new BehaviorSubject([] as NumberGoal[]);
         this.NumberGoals = this._numberGoals.asObservable();
 
-        this.loadState = this.loadState.bind(this);
+        this.loadUser = this.loadUser.bind(this);
         this.saveHabitGoal = this.saveHabitGoal.bind(this);
         this.saveListGoal = this.saveListGoal.bind(this);
         this.saveNumberGoal = this.saveNumberGoal.bind(this);
@@ -45,24 +45,24 @@ export default class GoalService {
         this.saveNumberLog = this.saveNumberLog.bind(this);
     }
 
-    loadState(): Observable<any> {
-        return zip(this.loadGoalOverviews(), this.loadHabitGoals(), this.loadListGoals(), this.loadNumberGoals());
+    loadUser(username: string): Observable<any> {
+        return zip(this.loadGoalOverviews(username), this.loadHabitGoals(username), this.loadListGoals(username), this.loadNumberGoals(username));
     }
 
-    private loadGoalOverviews(): Observable<GoalOverview[]> {
-        return this.load("https://localhost:44343/api/Goals", this._goalOverviews);
+    private loadGoalOverviews(username: string): Observable<GoalOverview[]> {
+        return this.load(`https://localhost:44343/api/Goals/${username}`, this._goalOverviews);
     }
 
-    private loadHabitGoals(): Observable<HabitGoal[]> {
-        return this.load("https://localhost:44343/api/HabitGoal", this._habitGoals);
+    private loadHabitGoals(username: string): Observable<HabitGoal[]> {
+        return this.load(`https://localhost:44343/api/HabitGoal${username}`, this._habitGoals);
     }
 
-    private loadNumberGoals(): Observable<NumberGoal[]> {
-        return this.load("https://localhost:44343/api/NumberGoal", this._numberGoals);
+    private loadNumberGoals(username: string): Observable<NumberGoal[]> {
+        return this.load(`https://localhost:44343/api/NumberGoal${username}`, this._numberGoals);
     }
 
-    private loadListGoals(): Observable<ListGoal[]> {
-        return this.load("https://localhost:44343/api/ListGoal", this._listGoals);
+    private loadListGoals(username: string): Observable<ListGoal[]> {
+        return this.load(`https://localhost:44343/api/ListGoal${username}`, this._listGoals);
     }
 
     private load<T>(url: string, stateSubject: BehaviorSubject<T>): Observable<T> {
