@@ -54,25 +54,26 @@ export default class GoalService {
     }
 
     private loadHabitGoals(username: string): Observable<HabitGoal[]> {
-        return this.load(`https://localhost:44343/api/HabitGoal${username}`, this._habitGoals);
+        return this.load(`https://localhost:44343/api/HabitGoal/${username}`, this._habitGoals);
     }
 
     private loadNumberGoals(username: string): Observable<NumberGoal[]> {
-        return this.load(`https://localhost:44343/api/NumberGoal${username}`, this._numberGoals);
+        return this.load(`https://localhost:44343/api/NumberGoal/${username}`, this._numberGoals);
     }
 
     private loadListGoals(username: string): Observable<ListGoal[]> {
-        return this.load(`https://localhost:44343/api/ListGoal${username}`, this._listGoals);
+        return this.load(`https://localhost:44343/api/ListGoal/${username}`, this._listGoals);
     }
 
     private load<T>(url: string, stateSubject: BehaviorSubject<T>): Observable<T> {
-        return this._httpClient.get<T>(url).pipe(
-            map((response: T) => {
-                stateSubject.next(response);
-                return response;
-            }),
-            take(1)
-        );
+        return this._httpClient.get<T>(url)
+            .pipe(
+                map((response: T) => {
+                    stateSubject.next(response);
+                    return response;
+                }),
+                take(1)
+            );
     }
 
     saveHabitGoal(habitGoal: HabitGoal): Observable<HabitGoal> {

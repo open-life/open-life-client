@@ -1,6 +1,8 @@
+import User from "../../models/User";
+
 export default interface IAuth0Context {
     isAuthenticated: boolean;
-    user: Object;
+    user: User;
     loading: boolean;
     popupOpen: boolean;
     loginWithPopup: ({ }) => Promise<void>;

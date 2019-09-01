@@ -7,13 +7,16 @@ export class ListGoal {
     public Target: number;
     public Items: ListItem[] = [];
 
-    constructor(name: string, listName: string, start: Date, end: Date, target: number) {
+    public UserId: number;
+
+    constructor(name: string, listName: string, start: Date, end: Date, target: number, userId: number) {
         this.ListGoalId = 0;
         this.Name = name;
         this.ListName = listName;
         this.StartDate = start;
         this.EndDate = end;
         this.Target = target;
+        this.UserId = userId;
     }
 }
 

@@ -6,6 +6,7 @@ import { HabitGoal } from "../models/HabitGoal";
 import { NumberGoal } from "../models/NumberGoal";
 import Input from "../components/Input";
 import { ListGoal } from "../models/ListGoal";
+import { Auth0Context } from "../components/Authentication/Auth0";
 
 interface Props {
     closeModal: Function;
@@ -23,12 +24,8 @@ interface State {
 };
 
 export default class CreateGoal extends React.Component<Props, State> {
-    private goalService: GoalService;
-
     constructor(props: Props) {
         super(props);
-
-        this.goalService = new GoalService();
 
         this.state = { goalType: 'Habit', name: '', startDate: new Date(), endDate: new Date(), goalAmount: 0, listName: '' };
 
@@ -109,16 +106,18 @@ export default class CreateGoal extends React.Component<Props, State> {
 
         switch (this.state.goalType) {
             case 'Habit':
-                service.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate));
+                service.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate, this.context.user.UserId));
                 break;
             case 'Number':
-                service.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                service.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
                 break;
             case 'List':
-                service.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount));
+                service.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
                 break;
         }
 
         this.props.closeModal();
     }
 }
+
+CreateGoal.contextType = Auth0Context;

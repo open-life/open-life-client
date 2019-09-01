@@ -169,7 +169,11 @@ export default class Profile extends React.Component<Props, State> {
   private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
     loader
       .pipe(takeWhile(() => this.appAlive))
-      .subscribe(value => this.setState({ [stateKey]: value } as unknown as State));
+      .subscribe(value => {
+        if (value !== null) {
+          this.setState({ [stateKey]: value } as unknown as State);
+        }
+      });
   }
 }
 

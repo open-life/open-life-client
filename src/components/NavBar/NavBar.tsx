@@ -28,7 +28,7 @@ export default class NavBar extends React.Component<Props, State>  {
                 <div id="navbarBasicExample" className="navbar-menu">
                     <div className="navbar-start">
                         <Link className="navbar-item" to="/">Home</Link>
-                        <Link className="navbar-item" to="/pchaffee">Profile</Link>
+                        <Link className="navbar-item" to="/phillipdensmorechaffee">Profile</Link>
                     </div>
                 </div>
 

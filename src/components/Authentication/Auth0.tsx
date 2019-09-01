@@ -2,7 +2,9 @@ import React from "react";
 import createAuth0Client from "@auth0/auth0-spa-js";
 import IAuth0Context from "./IAuth0Context";
 import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
-import { getIdTokenClaimsOptions, Auth0ClientOptions, RedirectLoginOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions, LogoutOptions } from "./Auth0Interfaces";
+import { getIdTokenClaimsOptions, Auth0ClientOptions, RedirectLoginOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions, LogoutOptions, AuthUser } from "./Auth0Interfaces";
+import UserService from "../../services/UserService";
+import User from "../../models/User";
 
 export const Auth0Context = React.createContext<IAuth0Context>({} as IAuth0Context);
 export const Auth0Provider = Auth0Context.Provider;
@@ -15,22 +17,27 @@ interface Auth0Props {
 
 interface Auth0State {
     isAuthenticated: boolean;
-    user: Object;
+    user: User;
     auth0Client: Auth0Client;
     loading: boolean;
     popupOpen: boolean;
 }
 
 export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
+    private readonly _userService: UserService;
+
     constructor(props: Auth0Props) {
         super(props);
 
-        this.state = { isAuthenticated: false, user: {}, auth0Client: {} as Auth0Client, loading: true, popupOpen: false };
+        this._userService = new UserService();
+
+        this.state = { isAuthenticated: false, user: {} as User, auth0Client: {} as Auth0Client, loading: true, popupOpen: false };
 
         this.getContext = this.getContext.bind(this);
         this.initAuth0 = this.initAuth0.bind(this);
         this.loginWithPopup = this.loginWithPopup.bind(this);
         this.handleRedirectCallback = this.handleRedirectCallback.bind(this);
+        this.setUser = this.setUser.bind(this);
     }
 
     render() {
@@ -83,12 +90,11 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
 
         const isAuthenticated = await auth0FromHook.isAuthenticated();
 
-        let user: Object = {};
         if (isAuthenticated) {
-            user = await auth0FromHook.getUser();
+            this.setUser(await auth0FromHook.getUser());
         }
 
-        this.setState({ auth0Client: auth0FromHook, isAuthenticated: isAuthenticated, user: user, loading: false });
+        this.setState({ auth0Client: auth0FromHook, isAuthenticated: isAuthenticated, loading: false });
     };
 
     async loginWithPopup(params = {}): Promise<void> {
@@ -100,14 +106,47 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
         } finally {
             this.setState({ popupOpen: false });
         }
-        const user = await this.state.auth0Client.getUser();
-        this.setState({ user: user, isAuthenticated: true });
+        this.setUser(await this.state.auth0Client.getUser());
+        this.setState({ isAuthenticated: true });
     };
 
     async handleRedirectCallback() {
         this.setState({ loading: true });
         await this.state.auth0Client.handleRedirectCallback();
-        const user = await this.state.auth0Client.getUser();
-        this.setState({ loading: false, isAuthenticated: true, user: user });
+        this.setUser(await this.state.auth0Client.getUser());
+        this.setState({ loading: false, isAuthenticated: true });
     };
+
+    private setUser(authUser: AuthUser): void {
+        const user = this.map(authUser);
+        this._userService.getUser(user.Email)
+            .subscribe(savedUser => {
+                if (!savedUser) {
+                    this._userService.saveUser(user)
+                        .subscribe(newUser => {
+                            user.UserId = newUser.UserId;
+                            this.setState({ user: user });
+                        });
+                } else {
+                    user.UserId = savedUser.UserId;
+                    this.setState({ user: user });
+                }
+            });
+    }
+
+    private map(authUser: AuthUser): User {
+        return new User(
+            authUser.name,
+            authUser.family_name,
+            authUser.given_name,
+            authUser.nickname,
+            authUser.email,
+            authUser.email_verified,
+            authUser.picture,
+            authUser.locale,
+            authUser.nickname,
+            authUser.sub,
+            authUser.updated_at
+        );
+    }
 }

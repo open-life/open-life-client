@@ -6,12 +6,15 @@ export class NumberGoal {
     public Target: number;
     public Logs: NumberLog[] = [];
 
-    constructor(name: string, start: Date, end: Date, target: number) {
+    public UserId: number;
+
+    constructor(name: string, start: Date, end: Date, target: number, userId: number) {
         this.NumberGoalId = 0;
         this.Name = name;
         this.StartDate = start;
         this.EndDate = end;
         this.Target = target;
+        this.UserId = userId;
     }
 }
 

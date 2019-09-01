@@ -6,12 +6,15 @@ export class HabitGoal {
     public Target: number;
     public Logs: HabitLog[] = [];
 
-    constructor(name: string, start: Date, end: Date) {
+    public UserId: number;
+
+    constructor(name: string, start: Date, end: Date, userId: number) {
         this.HabitGoalId = 0;
         this.Name = name;
         this.StartDate = start;
         this.EndDate = end;
         this.Target = this.dateDiffInDays(start, end);
+        this.UserId = userId;
     }
 
     private _MS_PER_DAY = 1000 * 60 * 60 * 24;

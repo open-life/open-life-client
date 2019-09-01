@@ -11,6 +11,9 @@ export default class HttpClient {
     get<T>(url: string): Observable<T> {
         return from(fetch(url, { mode: 'cors', headers: { 'Access-Control-Allow-Origin': '*', 'Authorization': `Bearer ${this._token}` } })
             .then(function (response) {
+                if (response.status !== 200) {
+                    return null as unknown as T;
+                }
                 return response.json();
             }));
     }
@@ -31,6 +34,7 @@ export default class HttpClient {
             body: JSON.stringify(body),
         })
             .then(response => {
+                console.log(response);
                 return response.json() as Promise<T>;
             }));
     }
