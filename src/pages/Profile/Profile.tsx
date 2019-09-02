@@ -177,7 +177,7 @@ export default class Profile extends React.Component<Props, State> {
       .pipe(takeWhile(() => this._appAlive))
       .subscribe(value => {
         if (value !== null) {
-          this.setState({ [stateKey]: value } as unknown as State, () => console.log(stateKey, value));
+          this.setState({ [stateKey]: value } as unknown as State);
         }
       });
   }

@@ -15,7 +15,6 @@ import { ListGoal } from './models/ListGoal';
 import { NumberGoal } from './models/NumberGoal';
 import { takeWhile } from 'rxjs/operators';
 import { Auth0Context } from './components/Authentication/Auth0';
-import { validate } from '@babel/types';
 
 interface AppProps { };
 interface AppState {
@@ -47,6 +46,15 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
+    if (!this.context.isAuthenticated) {
+      return (
+        <Router>
+          <NavBar />
+          <Home showModal={this.showModal} />
+        </Router>
+      );
+    }
+
     return (
       <Router>
         <NavBar />
@@ -62,6 +70,8 @@ export default class App extends React.Component<AppProps, AppState> {
   componentDidMount() {
     if (this.context.user) {
       this.loadData(this.context.user.username);
+    } else {
+      this.context.getTokenSilently();
     }
   }
 
@@ -69,7 +79,6 @@ export default class App extends React.Component<AppProps, AppState> {
     const user = this.context.user;
     if (user && user.Username && !this.state.dataLoaded) {
       this.setState({ dataLoaded: true });
-      console.log("User", user);
       this.loadData(user.Username);
     }
   }
@@ -107,7 +116,7 @@ export default class App extends React.Component<AppProps, AppState> {
   private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
     loader
       .pipe(takeWhile(() => this.appAlive))
-      .subscribe(value => this.setState({ [stateKey]: value } as unknown as AppState, () => console.log(stateKey + ': ', value)));
+      .subscribe(value => this.setState({ [stateKey]: value } as unknown as AppState));
   }
 }
 

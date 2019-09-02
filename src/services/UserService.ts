@@ -22,7 +22,6 @@ export default class UserService {
     }
 
     getUserWithUsername(username: string): Observable<User> {
-        console.log("this is happening");
         return this._httpClient.get<User>(`https://localhost:44343/api/User/username/${username}`)
             .pipe(take(1));
     }
