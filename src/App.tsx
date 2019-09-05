@@ -50,7 +50,8 @@ export default class App extends React.Component<AppProps, AppState> {
       return (
         <Router>
           <NavBar />
-          <Home showModal={this.showModal} />
+          <Route path='/:username' exact render={(props) => <Profile {...props} />} />
+          <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
         </Router>
       );
     }
@@ -67,18 +68,15 @@ export default class App extends React.Component<AppProps, AppState> {
     );
   }
 
-  componentDidMount() {
-    if (this.context.user) {
-      this.loadData(this.context.user.username);
-    } else {
-      this.context.getTokenSilently();
+  async componentDidMount() {
+    if (this.context.user && this.context.user.Username) {
+      this.loadData(this.context.user.Username);
     }
   }
 
   componentDidUpdate() {
     const user = this.context.user;
     if (user && user.Username && !this.state.dataLoaded) {
-      this.setState({ dataLoaded: true });
       this.loadData(user.Username);
     }
   }
@@ -104,6 +102,7 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   private loadData(username: string): void {
+    this.setState({ dataLoaded: true });
     const service = this.goalService;
 
     service.loadUserGoals(username).subscribe();

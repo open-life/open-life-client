@@ -1,3 +1,7 @@
+.home {
+    flex-grow: 1;
+}
+
 .log-button {
     cursor: pointer;
     transition: all 0.01s ease 0s;

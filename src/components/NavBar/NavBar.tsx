@@ -12,9 +12,9 @@ export default class NavBar extends React.Component<Props, State>  {
         return (
             <nav className="navbar" role="navigation" aria-label="main navigation">
                 <div className="navbar-brand">
-                    <a className="navbar-item" href="/">
+                    <Link className="navbar-item" to="/">
                         <h1 className="title is-2">Open Life</h1>
-                    </a>
+                    </Link>
 
                     <span role="button" className="navbar-burger burger" aria-label="menu" aria-expanded="false" data-target="navbarBasicExample">
                         <span aria-hidden="true"></span>

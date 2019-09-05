@@ -49,7 +49,7 @@ export default class GoalService {
         return zip(this.loadGoalOverviews(username), this.loadHabitGoals(username), this.loadListGoals(username), this.loadNumberGoals(username));
     }
 
-    private loadGoalOverviews(username: string): Observable<GoalOverview[]> {
+    loadGoalOverviews(username: string): Observable<GoalOverview[]> {
         return this.load(`https://localhost:44343/api/Goals/${username}`, this._goalOverviews);
     }
 

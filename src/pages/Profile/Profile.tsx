@@ -11,13 +11,14 @@ import { NumberGoal } from '../../models/NumberGoal';
 import { Auth0Context } from '../../components/Authentication/Auth0';
 import UserService from '../../services/UserService';
 import { RouteComponentProps } from 'react-router';
-import { Observable } from 'rxjs';
-import { takeWhile } from 'rxjs/operators';
+import { combineLatest } from 'rxjs';
 import GoalService from '../../services/GoalService';
 import User from '../../models/User';
+import { takeWhile } from 'rxjs/operators';
 
 interface Props extends RouteComponentProps<{ [s: string]: string; }> { };
 interface State {
+  loading: boolean;
   user: User;
 
   goalOverviews: GoalOverview[];
@@ -35,7 +36,7 @@ export default class Profile extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props);
 
-    this.state = { user: {} as User, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
+    this.state = { loading: true, user: {} as User, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
 
     this._appAlive = true;
     this._goalService = new GoalService();
@@ -50,6 +51,15 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   render() {
+    if (this.state.loading) {
+      return (
+        <section className="section">
+          <div className="container has-text-centered">
+          </div>
+        </section>
+      );
+    }
+
     const profilePic = this.buildProfilePic();
     const header = this.buildHeader(profilePic);
     const goals = this.buildGoals();
@@ -162,24 +172,26 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   private loadData(): void {
-    const service = this._goalService;
-    service.loadUserGoals(this.props.match.params.username).subscribe();
-
-    this.loadStatePiece<User>(this._userService.getUserWithUsername(this.props.match.params.username), 'user');
-    this.loadStatePiece<GoalOverview[]>(service.GoalOverViews, 'goalOverviews');
-    this.loadStatePiece<HabitGoal[]>(service.HabitGoals, 'habitGoals');
-    this.loadStatePiece<ListGoal[]>(service.ListGoals, 'listGoals');
-    this.loadStatePiece<NumberGoal[]>(service.NumberGoals, 'numberGoals');
+    this.loadState();
+    this._goalService
+      .loadUserGoals(this.props.match.params.username)
+      .subscribe(() => this.setState({ loading: false }));
   }
 
-  private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
-    loader
+  private loadState() {
+    const service = this._goalService;
+
+    combineLatest(
+      this._userService.getUserWithUsername(this.props.match.params.username),
+      service.GoalOverViews,
+      service.HabitGoals,
+      service.ListGoals,
+      service.NumberGoals
+    )
       .pipe(takeWhile(() => this._appAlive))
-      .subscribe(value => {
-        if (value !== null) {
-          this.setState({ [stateKey]: value } as unknown as State);
-        }
-      });
+      .subscribe(state => {
+        this.setState({ user: state[0], goalOverviews: state[1], habitGoals: state[2], listGoals: state[3], numberGoals: state[4] });
+      })
   }
 }
 

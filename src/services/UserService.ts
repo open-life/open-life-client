@@ -16,6 +16,10 @@ export default class UserService {
         this._httpClient.patch(`https://${config.domain}.auth0.com/api/v2/users`, { picture: picUrl });
     }
 
+    getUsers(): Observable<User[]> {
+        return this._httpClient.get<User[]>('https://localhost:44343/api/User').pipe(take(1));
+    }
+
     getUserWithEmail(email: string): Observable<User> {
         return this._httpClient.get<User>(`https://localhost:44343/api/User/email/${email}`)
             .pipe(take(1));

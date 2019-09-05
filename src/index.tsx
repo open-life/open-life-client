@@ -7,6 +7,9 @@ import config from "./auth_config.json";
 import Auth0 from './components/Authentication/Auth0';
 
 const onRedirectCallback = (appState: { targetUrl: string | null | undefined; }) => {
+    // Temporary Firefox workaround
+    window.location.hash = window.location.hash; // eslint-disable-line no-self-assign
+
     window.history.replaceState(
         {},
         document.title,
