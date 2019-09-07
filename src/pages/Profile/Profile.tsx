@@ -51,18 +51,17 @@ export default class Profile extends React.Component<Props, State> {
   }
 
   render() {
-    if (this.state.loading) {
-      return (
-        <section className="section">
-          <div className="container has-text-centered">
-          </div>
-        </section>
-      );
-    }
-
     const profilePic = this.buildProfilePic();
     const header = this.buildHeader(profilePic);
     const goals = this.buildGoals();
+
+    if (this.state.loading) {
+      return (
+        <div>
+          {header}
+        </div>
+      );
+    }
 
     return (
       <div>
@@ -73,7 +72,7 @@ export default class Profile extends React.Component<Props, State> {
 
             <h2 className="title is-2">Goals</h2>
             <Overview goals={this.state.goalOverviews.map(g => g.Name)}
-              status={this.state.goalOverviews.map(g => g.Progress)} />
+              status={this.state.goalOverviews.map(g => `${+(g.Progress / g.Target).toFixed(2)}%`)} />
 
             {goals.habitGoals}
 
@@ -167,11 +166,18 @@ export default class Profile extends React.Component<Props, State> {
     this.loadData();
   }
 
+  componentDidUpdate(oldProps: Props, oldState: State) {
+    if (oldProps.match.params.username !== this.props.match.params.username) {
+      this.loadData();
+    }
+  }
+
   componentWillUnmount() {
     this._appAlive = false;
   }
 
   private loadData(): void {
+    this.setState({ loading: true });
     this.loadState();
     this._goalService
       .loadUserGoals(this.props.match.params.username)

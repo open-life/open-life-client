@@ -72,10 +72,25 @@ export default class HttpClient {
             },
             redirect: 'follow',
             referrer: 'no-referrer',
-            body: JSON.stringify(body),
+            body: JSON.stringify(body)
         })
             .then(response => {
                 return response.json() as Promise<T>;
             }));
+    }
+
+    delete(url: string): void {
+        fetch(url, {
+            method: 'DELETE',
+            mode: 'cors',
+            cache: 'no-cache',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${this._token}`
+            },
+            referrer: 'no-referrer'
+        })
     }
 }

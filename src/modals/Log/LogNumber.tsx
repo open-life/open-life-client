@@ -2,12 +2,11 @@ import React, { ChangeEvent } from "react";
 import DatePicker from "react-datepicker";
 import Input from "../../components/Input";
 import { NumberGoal, NumberLog } from "../../models/NumberGoal";
-import { Observable } from "rxjs";
+import { Auth0Context } from "../../components/Authentication/Auth0";
 
 interface Props {
     goal: NumberGoal;
     closeModal: Function;
-    save: (numberLog: NumberLog) => Observable<NumberGoal>;
 }
 
 interface State {
@@ -27,7 +26,8 @@ export default class LogNumber extends React.Component<Props, State> {
 
     render() {
         return (
-            <div>
+            <div className="box">
+                <h4 className="title is-4">Log Goal - {this.props.goal.Name}</h4>
                 <div className="field">
                     <label className="label">Date</label>
                     <div className="control">
@@ -35,7 +35,7 @@ export default class LogNumber extends React.Component<Props, State> {
                     </div>
                 </div>
                 <Input name="goalAmount" label="Amount" placeholder="100" handleChange={this.handleChange} />
-                <span className="button is-link" onClick={() => this.save()}>Habit Completed</span>
+                <span className="button is-link" onClick={() => this.save()}>Log</span>
             </div>
         )
     }
@@ -53,7 +53,9 @@ export default class LogNumber extends React.Component<Props, State> {
 
     save(): void {
         this.props.closeModal();
-        this.props.save(new NumberLog(this.props.goal.NumberGoalId, this.state.date, this.state.goalAmount));
+        this.context.userGoals.saveNumberLog(new NumberLog(this.props.goal.NumberGoalId, this.state.date, this.state.goalAmount));
         this.setState({ date: new Date(), goalAmount: 0 });
     }
 }
+
+LogNumber.contextType = Auth0Context;

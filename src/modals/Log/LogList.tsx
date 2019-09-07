@@ -2,12 +2,11 @@ import React, { ChangeEvent } from "react";
 import { ListGoal, Progress, ListItem } from "../../models/ListGoal";
 import Input from "../../components/Input";
 import MultiSelect from "../../components/MultiSelect";
-import { Observable } from "rxjs";
+import { Auth0Context } from "../../components/Authentication/Auth0";
 
 interface Props {
     goal: ListGoal;
     closeModal: Function;
-    save: (listItem: ListItem) => Observable<ListGoal>;
 }
 
 interface State {
@@ -26,10 +25,11 @@ export default class LogList extends React.Component<Props, State> {
 
     render() {
         return (
-            <div>
-                <Input name="itemName" label="Item Name" placeholder="100" handleChange={this.handleChange} />
+            <div className="box">
+                <h4 className="title is-4">Log Goal - {this.props.goal.Name}</h4>
+                <Input name="itemName" label="Item Name" placeholder="e.g. Wuthering Heights" handleChange={this.handleChange} />
                 <MultiSelect name="itemProgress" label="Item Progress" options={[Progress.InProgress, Progress.Completed]} handleChange={this.handleChange} />
-                <span className="button is-link" onClick={() => this.save()}>Habit Completed</span>
+                <span className="button is-link" onClick={() => this.save()}>Log</span>
             </div>
         )
     }
@@ -43,7 +43,9 @@ export default class LogList extends React.Component<Props, State> {
 
     save(): void {
         this.props.closeModal();
-        this.props.save(new ListItem(this.props.goal.ListGoalId, this.state.itemName, this.state.itemProgress));
+        this.context.userGoals.saveListItem(new ListItem(this.props.goal.ListGoalId, this.state.itemName, this.state.itemProgress));
         this.setState({ itemName: '', itemProgress: Progress.InProgress });
     }
 }
+
+LogList.contextType = Auth0Context;

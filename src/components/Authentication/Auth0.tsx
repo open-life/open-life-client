@@ -5,6 +5,7 @@ import Auth0Client from "@auth0/auth0-spa-js/dist/typings/Auth0Client";
 import { getIdTokenClaimsOptions, Auth0ClientOptions, RedirectLoginOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions, LogoutOptions, AuthUser } from "./Auth0Interfaces";
 import UserService from "../../services/UserService";
 import User from "../../models/User";
+import GoalService from "../../services/GoalService";
 
 export const Auth0Context = React.createContext<IAuth0Context>({} as IAuth0Context);
 export const Auth0Provider = Auth0Context.Provider;
@@ -16,6 +17,7 @@ interface Auth0Props {
 }
 
 interface Auth0State {
+    userGoals: GoalService;
     isAuthenticated: boolean;
     user: User;
     auth0Client: Auth0Client;
@@ -31,7 +33,7 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
 
         this._userService = new UserService();
 
-        this.state = { isAuthenticated: false, user: {} as User, auth0Client: {} as Auth0Client, loading: true, popupOpen: false };
+        this.state = { userGoals: new GoalService(), isAuthenticated: false, user: {} as User, auth0Client: {} as Auth0Client, loading: true, popupOpen: false };
 
         this.getContext = this.getContext.bind(this);
         this.initAuth0 = this.initAuth0.bind(this);
@@ -51,6 +53,7 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
     getContext(): IAuth0Context {
         let isAuthenticated = this.state.isAuthenticated;
         let user = this.state.user;
+        let userGoals = this.state.userGoals;
         let loading = this.state.loading;
         let popupOpen = this.state.popupOpen;
         let loginWithPopup = this.loginWithPopup;
@@ -60,6 +63,7 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
         return {
             isAuthenticated,
             user,
+            userGoals,
             loading,
             popupOpen,
             loginWithPopup,
@@ -81,7 +85,6 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
     }
 
     async initAuth0() {
-        console.log("initAuth0");
         const auth0FromHook = await createAuth0Client(this.props.initOptions);
 
         if (window.location.search.includes("code=")) {

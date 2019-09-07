@@ -1,12 +1,11 @@
 import React from "react";
 import DatePicker from "react-datepicker";
 import { HabitGoal, HabitLog } from "../../models/HabitGoal";
-import { Observable } from "rxjs";
+import { Auth0Context } from "../../components/Authentication/Auth0";
 
 interface Props {
     goal: HabitGoal;
     closeModal: Function;
-    save: (habitLog: HabitLog) => Observable<HabitGoal>;
 }
 
 interface State {
@@ -24,7 +23,8 @@ export default class LogHabit extends React.Component<Props, State> {
 
     render() {
         return (
-            <div>
+            <div className="box">
+                <h4 className="title is-4">Log Habit - {this.props.goal.Name}</h4>
                 <div className="field">
                     <label className="label">Date</label>
                     <div className="control">
@@ -42,7 +42,9 @@ export default class LogHabit extends React.Component<Props, State> {
 
     save(): void {
         this.props.closeModal();
-        this.props.save(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true));
+        this.context.userGoals.saveHabitLog(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true));
         this.setState({ date: new Date() });
     }
 }
+
+LogHabit.contextType = Auth0Context;

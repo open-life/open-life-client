@@ -1,7 +1,6 @@
 import React, { ChangeEvent } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import GoalService from "../services/GoalService";
 import { HabitGoal } from "../models/HabitGoal";
 import { NumberGoal } from "../models/NumberGoal";
 import Input from "../components/Input";
@@ -10,8 +9,8 @@ import { Auth0Context } from "../components/Authentication/Auth0";
 
 interface Props {
     closeModal: Function;
-    goalService: GoalService;
-};
+}
+
 interface State {
     goalType: string;
     name: string;
@@ -21,7 +20,7 @@ interface State {
     goalAmount: number;
 
     listName: string;
-};
+}
 
 export default class CreateGoal extends React.Component<Props, State> {
     constructor(props: Props) {
@@ -102,17 +101,17 @@ export default class CreateGoal extends React.Component<Props, State> {
     }
 
     saveGoal() {
-        const service = this.props.goalService;
+        const userGoals = this.context.userGoals;
 
         switch (this.state.goalType) {
             case 'Habit':
-                service.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate, this.context.user.UserId));
+                userGoals.saveHabitGoal(new HabitGoal(this.state.name, this.state.startDate, this.state.endDate, this.context.user.UserId));
                 break;
             case 'Number':
-                service.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
+                userGoals.saveNumberGoal(new NumberGoal(this.state.name, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
                 break;
             case 'List':
-                service.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
+                userGoals.saveListGoal(new ListGoal(this.state.name, this.state.listName, this.state.startDate, this.state.endDate, this.state.goalAmount, this.context.user.UserId));
                 break;
         }
 

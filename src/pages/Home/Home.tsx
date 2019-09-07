@@ -7,15 +7,22 @@ import GoalService from '../../services/GoalService';
 import UserService from '../../services/UserService';
 import { Observable, combineLatest } from 'rxjs';
 import { take } from 'rxjs/operators';
+import AdminBox from '../../components/Admin/AdminBox';
+import { HabitGoal } from '../../models/HabitGoal';
+import { ListGoal } from '../../models/ListGoal';
+import { NumberGoal } from '../../models/NumberGoal';
 
 interface Props {
-    showModal: Function;
-};
+    showCreateModal: Function;
+    logHabitModal: (goal: HabitGoal) => void;
+    logListModal: (goal: ListGoal) => void;
+    logNumberModal: (goal: NumberGoal) => void;
+}
+
 interface State {
     loading: boolean;
-    overviews: GoalOverview[];
     userBoxes: JSX.Element[];
-};
+}
 
 export default class Home extends React.Component<Props, State> {
     private _goalService: GoalService;
@@ -24,48 +31,35 @@ export default class Home extends React.Component<Props, State> {
     constructor(props: Props) {
         super(props);
 
-        this.state = { overviews: [], userBoxes: [], loading: true };
+        this.state = { userBoxes: [], loading: true };
 
         this._goalService = new GoalService();
         this._userService = new UserService();
 
-        this.addOrWelcome = this.addOrWelcome.bind(this);
+        this.adminOrWelcome = this.adminOrWelcome.bind(this);
     }
 
     render() {
-        let addOrWelcome = this.addOrWelcome();
+        let adminOrWelcome = this.adminOrWelcome();
 
         return (
-            <div className="section home">
-                {addOrWelcome}
-                <div className="container">
-                    <h2 className="title is-2">Users</h2>
-                    {!this.state.loading && this.state.userBoxes}
+            <div className="home">
+                <div className="section">
+                    {adminOrWelcome}
+                </div>
+                <div className="section">
+                    <div className="container userBoxes">
+                        <h2 className="title is-2 has-text-centered">Users</h2>
+                        {!this.state.loading && this.state.userBoxes}
+                    </div>
                 </div>
             </div>
         );
     }
 
-    addOrWelcome(): JSX.Element {
+    adminOrWelcome(): JSX.Element {
         if (this.context.isAuthenticated) {
-            return (
-                <div className="container has-text-centered">
-                    <div className="columns is-centered">
-                        <div className="column is-2">
-                            <span className="icon is-large log-button">
-                                <i className="fas fa-3x fa-plus-circle" onClick={() => this.props.showModal('create')}></i>
-                            </span>
-                            <h1 className="title is-4">Create a goal</h1>
-                        </div>
-                        <div className="column is-2">
-                            <span className="icon is-large log-button">
-                                <i className="fas fa-3x fa-plus-circle" onClick={() => this.props.showModal('log')}></i>
-                            </span>
-                            <h1 className="title is-4">Log a goal</h1>
-                        </div>
-                    </div>
-                </div>
-            )
+            return <AdminBox showCreateModal={this.props.showCreateModal} logHabitModal={this.props.logHabitModal} logListModal={this.props.logListModal} logNumberModal={this.props.logNumberModal} />
         }
 
         return (
@@ -93,10 +87,12 @@ export default class Home extends React.Component<Props, State> {
                 combineLatest(overviewTasks)
                     .subscribe(overviews => {
                         overviews.forEach(overview => {
-                            const userId = overview[0].UserId;
-                            const user = users.filter(u => u.UserId === userId)[0];
+                            if (overview.length !== 0) {
+                                const userId = overview[0].UserId;
+                                const user = users.filter(u => u.UserId === userId)[0];
 
-                            userBoxes.push(<UserBox user={user} userGoals={overview} />);
+                                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overview} />);
+                            }
                         })
 
                         this.setState({ userBoxes: userBoxes, loading: false });

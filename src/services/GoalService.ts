@@ -143,4 +143,34 @@ export default class GoalService {
         listGoal.Items.push(listItem);
         return this.saveListGoal(listGoal);
     }
+
+    deleteHabitGoal(habitGoalId: number) {
+        let habitGoals = this._habitGoals.value;
+        let habitGoalIndex = habitGoals.findIndex(g => g.HabitGoalId === habitGoalId);
+
+        habitGoals.splice(habitGoalIndex, 1);
+        this._habitGoals.next(habitGoals);
+
+        this._httpClient.delete(`https://localhost:44343/api/HabitGoal/${habitGoalId}`);
+    }
+
+    deleteListGoal(listGoalId: number) {
+        let listGoals = this._listGoals.value;
+        let listGoalIndex = listGoals.findIndex(g => g.ListGoalId === listGoalId);
+
+        listGoals.splice(listGoalIndex, 1);
+        this._listGoals.next(listGoals);
+
+        this._httpClient.delete(`https://localhost:44343/api/ListGoal/${listGoalId}`);
+    }
+
+    deleteNumberGoal(numberGoalId: number) {
+        let numberGoals = this._numberGoals.value;
+        let numberGoalIndex = numberGoals.findIndex(g => g.NumberGoalId === numberGoalId);
+
+        numberGoals.splice(numberGoalIndex, 1);
+        this._numberGoals.next(numberGoals);
+
+        this._httpClient.delete(`https://localhost:44343/api/NumberGoal/${numberGoalId}`);
+    }
 }

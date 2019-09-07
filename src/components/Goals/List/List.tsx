@@ -9,8 +9,7 @@ interface ListState { };
 
 export default class List extends React.Component<ListProps, ListState> {
   render() {
-
-    const rows = this.props.goal.Items ? this.props.goal.Items.map(i => <tr key={this.props.goal.ListGoalId}><td>{i.Name}</td><td>{i.Progress}</td></tr>) : null;
+    const rows = this.props.goal.Items ? this.props.goal.Items.map(i => <tr key={i.ListItemId}><td>{i.Name}</td><td>{i.Progress}</td></tr>) : null;
 
     return (
       <div className="box">

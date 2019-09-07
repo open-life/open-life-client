@@ -1,8 +1,10 @@
 import User from "../../models/User";
+import GoalService from "../../services/GoalService";
 
 export default interface IAuth0Context {
     isAuthenticated: boolean;
     user: User;
+    userGoals: GoalService;
     loading: boolean;
     popupOpen: boolean;
     loginWithPopup: ({ }) => Promise<void>;
