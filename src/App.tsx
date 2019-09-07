@@ -46,29 +46,21 @@ export default class App extends React.Component<AppProps, AppState> {
   }
 
   render() {
-    if (!this.context.isAuthenticated) {
-      return (
-        <Router>
-          <NavBar />
-          <Route path='/:username' exact render={(props) => <Profile {...props} />} />
-          <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
-        </Router>
-      );
-    }
-
     return (
       <Router>
         <NavBar />
         <Route path='/' exact render={(props) => <Home {...props} showModal={this.showModal} />} />
         <Route path='/:username' exact render={(props) => <Profile {...props} />} />
-        <Modal Active={this.state.modalActive} closeModal={this.closeModal}>
-          {this.state.modal}
-        </Modal>
+        {this.context.isAuthenticated &&
+          <Modal Active={this.state.modalActive} closeModal={this.closeModal}>
+            {this.state.modal}
+          </Modal>
+        }
       </Router>
     );
   }
 
-  async componentDidMount() {
+  componentDidMount() {
     if (this.context.user && this.context.user.Username) {
       this.loadData(this.context.user.Username);
     }

@@ -12,6 +12,7 @@ interface UserBoxState { };
 export default class UserBox extends React.Component<UserBoxProps, UserBoxState>{
     render() {
         const user = this.props.user;
+        const goals: JSX.Element[] = this.props.userGoals.map(g => <li>{g.Name}</li>);
 
         return (
             <Link to={`/${user.Username}`}>
@@ -25,6 +26,13 @@ export default class UserBox extends React.Component<UserBoxProps, UserBoxState>
                         <div className="column is-4">
                             <h1 className="title is-1">{user.Name}</h1>
                             <h3 className="subtitle is-3">{this.props.userGoals.length} goals</h3>
+                        </div>
+                        <div className="column is-6">
+                            <div className="content">
+                                <ul>
+                                    {goals}
+                                </ul>
+                            </div>
                         </div>
                     </div>
                 </div>
