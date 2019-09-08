@@ -118,7 +118,7 @@ export default class Profile extends React.Component<Props, State> {
       if (files) {
         const token = this.context.getTokenSilently();
         const userService = new UserService(await token);
-        userService.postProfilePicture("FIx this");
+        //userService.postProfilePicture("FIx this");
       }
     }
   }

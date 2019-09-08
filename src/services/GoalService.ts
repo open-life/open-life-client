@@ -5,6 +5,7 @@ import { ListGoal, ListItem } from '../models/ListGoal';
 import { Observable, BehaviorSubject, zip } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import HttpClient from './HttpClient';
+import config from '../app_config.json';
 
 export default class GoalService {
     private _httpClient: HttpClient;
@@ -50,19 +51,19 @@ export default class GoalService {
     }
 
     loadGoalOverviews(username: string): Observable<GoalOverview[]> {
-        return this.load(`https://localhost:44343/api/Goals/${username}`, this._goalOverviews);
+        return this.load(config.api_url + `/api/Goals/${username}`, this._goalOverviews);
     }
 
     private loadHabitGoals(username: string): Observable<HabitGoal[]> {
-        return this.load(`https://localhost:44343/api/HabitGoal/${username}`, this._habitGoals);
+        return this.load(config.api_url + `/api/HabitGoal/${username}`, this._habitGoals);
     }
 
     private loadNumberGoals(username: string): Observable<NumberGoal[]> {
-        return this.load(`https://localhost:44343/api/NumberGoal/${username}`, this._numberGoals);
+        return this.load(config.api_url + `/api/NumberGoal/${username}`, this._numberGoals);
     }
 
     private loadListGoals(username: string): Observable<ListGoal[]> {
-        return this.load(`https://localhost:44343/api/ListGoal/${username}`, this._listGoals);
+        return this.load(config.api_url + `/api/ListGoal/${username}`, this._listGoals);
     }
 
     private load<T>(url: string, stateSubject: BehaviorSubject<T>): Observable<T> {
@@ -78,25 +79,25 @@ export default class GoalService {
 
     saveHabitGoal(habitGoal: HabitGoal): Observable<HabitGoal> {
         if (habitGoal.HabitGoalId === 0) {
-            return this.save<HabitGoal>("https://localhost:44343/api/HabitGoal", habitGoal, this._habitGoals);
+            return this.save<HabitGoal>(config.api_url + "/api/HabitGoal", habitGoal, this._habitGoals);
         } else {
-            return this._httpClient.put<HabitGoal>(`https://localhost:44343/api/HabitGoal/${habitGoal.HabitGoalId}`, habitGoal);
+            return this._httpClient.put<HabitGoal>(config.api_url + `/api/HabitGoal/${habitGoal.HabitGoalId}`, habitGoal);
         }
     }
 
     saveNumberGoal(numberGoal: NumberGoal): Observable<NumberGoal> {
         if (numberGoal.NumberGoalId === 0) {
-            return this.save<NumberGoal>("https://localhost:44343/api/NumberGoal", numberGoal, this._numberGoals);
+            return this.save<NumberGoal>(config.api_url + "/api/NumberGoal", numberGoal, this._numberGoals);
         } else {
-            return this._httpClient.put<NumberGoal>(`https://localhost:44343/api/NumberGoal/${numberGoal.NumberGoalId}`, numberGoal);
+            return this._httpClient.put<NumberGoal>(config.api_url + `/api/NumberGoal/${numberGoal.NumberGoalId}`, numberGoal);
         }
     }
 
     saveListGoal(listGoal: ListGoal): Observable<ListGoal> {
         if (listGoal.ListGoalId === 0) {
-            return this.save<ListGoal>("https://localhost:44343/api/ListGoal", listGoal, this._listGoals);
+            return this.save<ListGoal>(config.api_url + "/api/ListGoal", listGoal, this._listGoals);
         } else {
-            return this._httpClient.put<ListGoal>(`https://localhost:44343/api/ListGoal/${listGoal.ListGoalId}`, listGoal);
+            return this._httpClient.put<ListGoal>(config.api_url + `/api/ListGoal/${listGoal.ListGoalId}`, listGoal);
         }
     }
 
@@ -151,7 +152,7 @@ export default class GoalService {
         habitGoals.splice(habitGoalIndex, 1);
         this._habitGoals.next(habitGoals);
 
-        this._httpClient.delete(`https://localhost:44343/api/HabitGoal/${habitGoalId}`);
+        this._httpClient.delete(config.api_url + `/api/HabitGoal/${habitGoalId}`);
     }
 
     deleteListGoal(listGoalId: number) {
@@ -161,7 +162,7 @@ export default class GoalService {
         listGoals.splice(listGoalIndex, 1);
         this._listGoals.next(listGoals);
 
-        this._httpClient.delete(`https://localhost:44343/api/ListGoal/${listGoalId}`);
+        this._httpClient.delete(config.api_url + `/api/ListGoal/${listGoalId}`);
     }
 
     deleteNumberGoal(numberGoalId: number) {
@@ -171,6 +172,6 @@ export default class GoalService {
         numberGoals.splice(numberGoalIndex, 1);
         this._numberGoals.next(numberGoals);
 
-        this._httpClient.delete(`https://localhost:44343/api/NumberGoal/${numberGoalId}`);
+        this._httpClient.delete(config.api_url + `/api/NumberGoal/${numberGoalId}`);
     }
 }
