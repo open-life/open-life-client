@@ -29,6 +29,16 @@ export default class NavBar extends React.Component<Props, State>  {
                         <div className="navbar-start">
                             <Link className="navbar-item" to="/">Home</Link>
                             <Link className="navbar-item" to={`/${this.context.user.Username}`}>Profile</Link>
+                            <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new" target="_blank" rel="noopener noreferrer">Provide Feedback</a>
+                        </div>
+                    </div>
+                }
+
+                {
+                    !this.context.isAuthenticated &&
+                    <div id="navbarBasicExample" className="navbar-menu">
+                        <div className="navbar-start">
+                            <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new" target="_blank" rel="noopener noreferrer">Provide Feedback</a>
                         </div>
                     </div>
                 }
