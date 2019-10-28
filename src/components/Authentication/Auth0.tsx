@@ -53,12 +53,14 @@ export default class Auth0 extends React.Component<Auth0Props, Auth0State> {
     getContext(): IAuth0Context {
         let isAuthenticated = this.state.isAuthenticated;
         let user = this.state.user;
-        let userGoals = this.state.userGoals;
         let loading = this.state.loading;
         let popupOpen = this.state.popupOpen;
         let loginWithPopup = this.loginWithPopup;
         let handleRedirectCallback = this.handleRedirectCallback;
         let auth0Client = this.state.auth0Client;
+        console.log(auth0Client);
+        console.log(auth0Client.hasOwnProperty('getTokenSilently'));
+        let userGoals = new GoalService(auth0Client.hasOwnProperty('getTokenSilently') ? auth0Client.getTokenSilently() as unknown as string : '');
 
         return {
             isAuthenticated,

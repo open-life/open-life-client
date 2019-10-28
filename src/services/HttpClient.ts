@@ -5,6 +5,7 @@ export default class HttpClient {
     private _token: string;
 
     constructor(token: string = '') {
+        console.log(token);
         this._token = token;
     }
 

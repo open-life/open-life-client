@@ -21,7 +21,7 @@ const onRedirectCallback = (appState: { targetUrl: string | null | undefined; })
 
 ReactDOM.render(
     <Auth0
-        initOptions={{ domain: config.domain, client_id: config.clientId, redirect_uri: window.location.origin }}
+        initOptions={{ domain: config.domain, client_id: config.clientId, redirect_uri: window.location.origin, audience: config.audience }}
         onRedirectCallback={onRedirectCallback}>
         <App />
     </Auth0>,

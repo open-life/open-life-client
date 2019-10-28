@@ -39,7 +39,7 @@ export default class Profile extends React.Component<Props, State> {
     this.state = { loading: true, user: {} as User, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
 
     this._appAlive = true;
-    this._goalService = new GoalService();
+    this._goalService = new GoalService(this.context.getTokenSilently());
     this._userService = new UserService();
     this._profilePicUpload = React.createRef();
 

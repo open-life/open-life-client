@@ -33,7 +33,7 @@ export default class Home extends React.Component<Props, State> {
 
         this.state = { userBoxes: [], loading: true };
 
-        this._goalService = new GoalService();
+        this._goalService = new GoalService(this.context.getTokenSilently());
         this._userService = new UserService();
 
         this.adminOrWelcome = this.adminOrWelcome.bind(this);

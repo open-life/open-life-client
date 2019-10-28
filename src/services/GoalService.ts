@@ -22,8 +22,8 @@ export default class GoalService {
     private _numberGoals: BehaviorSubject<NumberGoal[]>;
     public NumberGoals: Observable<NumberGoal[]>;
 
-    constructor() {
-        this._httpClient = new HttpClient();
+    constructor(token: string = '') {
+        this._httpClient = new HttpClient(token);
 
         this._goalOverviews = new BehaviorSubject([] as GoalOverview[]);
         this.GoalOverViews = this._goalOverviews.asObservable();
