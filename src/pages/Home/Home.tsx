@@ -1,16 +1,16 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './Home.css';
-import { Auth0Context } from '../../components/Authentication/Auth0';
 import UserBox from '../../components/UserBox/UserBox';
 import GoalOverview from '../../models/GoalOverview';
 import GoalService from '../../services/GoalService';
 import UserService from '../../services/UserService';
-import { Observable, combineLatest } from 'rxjs';
-import { take } from 'rxjs/operators';
+import {Observable, combineLatest} from 'rxjs';
+import {take} from 'rxjs/operators';
 import AdminBox from '../../components/Admin/AdminBox';
-import { HabitGoal } from '../../models/HabitGoal';
-import { ListGoal } from '../../models/ListGoal';
-import { NumberGoal } from '../../models/NumberGoal';
+import {HabitGoal} from '../../models/HabitGoal';
+import {ListGoal} from '../../models/ListGoal';
+import {NumberGoal} from '../../models/NumberGoal';
+import {useAuth0} from "@auth0/auth0-react";
 
 interface Props {
     showCreateModal: Function;
@@ -19,66 +19,25 @@ interface Props {
     logNumberModal: (goal: NumberGoal) => void;
 }
 
-interface State {
-    loading: boolean;
-    userBoxes: JSX.Element[];
-}
+const Home: React.FC<Props> = (props) => {
+    const {isAuthenticated} = useAuth0();
 
-export default class Home extends React.Component<Props, State> {
-    private _goalService: GoalService;
-    private _userService: UserService;
+    const goalService = new GoalService();
+    const userService = new UserService();
 
-    constructor(props: Props) {
-        super(props);
+    const [userBoxes, setUserBoxes] = useState([] as JSX.Element[]);
+    const [loading, setLoading] = useState(false);
 
-        this.state = { userBoxes: [], loading: true };
-
-        this._goalService = new GoalService();
-        this._userService = new UserService();
-
-        this.adminOrWelcome = this.adminOrWelcome.bind(this);
-    }
-
-    render() {
-        let adminOrWelcome = this.adminOrWelcome();
-
-        return (
-            <div className="home">
-                <div className="section">
-                    {adminOrWelcome}
-                </div>
-                <div className="section">
-                    <div className="container userBoxes">
-                        <h2 className="title is-2 has-text-centered">Users</h2>
-                        {!this.state.loading && this.state.userBoxes}
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    adminOrWelcome(): JSX.Element {
-        if (this.context.isAuthenticated) {
-            return <AdminBox showCreateModal={this.props.showCreateModal} logHabitModal={this.props.logHabitModal} logListModal={this.props.logListModal} logNumberModal={this.props.logNumberModal} />
-        }
-
-        return (
-            <div className="container has-text-centered">
-                <h1 className="title is-1">Welcome!</h1>
-            </div>
-        )
-    }
-
-    componentDidMount() {
+    useEffect(() => {
         let userBoxes: JSX.Element[] = [];
 
-        this._userService
+        userService
             .getUsers()
             .subscribe(users => {
                 let overviewTasks: Observable<GoalOverview[]>[] = [];
                 users.forEach(user => {
                     overviewTasks.push(
-                        this._goalService
+                        goalService
                             .loadGoalOverviews(user.Username)
                             .pipe(take(1))
                     )
@@ -91,14 +50,42 @@ export default class Home extends React.Component<Props, State> {
                                 const userId = overview[0].UserId;
                                 const user = users.filter(u => u.UserId === userId)[0];
 
-                                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overview} />);
+                                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overview}/>);
                             }
                         })
 
-                        this.setState({ userBoxes: userBoxes, loading: false });
+                        setUserBoxes(userBoxes);
+                        setLoading(false);
                     })
             });
+    })
+
+    const {showCreateModal, logHabitModal, logListModal, logNumberModal} = props;
+
+    let adminOrWelcome: JSX.Element;
+    if (isAuthenticated) {
+        adminOrWelcome =
+            <AdminBox showCreateModal={showCreateModal} logHabitModal={logHabitModal} logListModal={logListModal}
+                      logNumberModal={logNumberModal}/>
+    } else {
+        adminOrWelcome = <div className="container has-text-centered">
+            <h1 className="title is-1">Welcome!</h1>
+        </div>
     }
+
+    return (
+        <div className="home">
+            <div className="section">
+                {adminOrWelcome}
+            </div>
+            <div className="section">
+                <div className="container userBoxes">
+                    <h2 className="title is-2 has-text-centered">Users</h2>
+                    {!loading && userBoxes}
+                </div>
+            </div>
+        </div>
+    );
 }
 
-Home.contextType = Auth0Context;
+export default Home;
