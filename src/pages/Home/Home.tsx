@@ -2,14 +2,13 @@ import React, {useContext, useEffect, useState} from 'react';
 import './Home.css';
 import UserBox from '../../components/UserBox/UserBox';
 import GoalOverview from '../../models/GoalOverview';
-import {Observable, combineLatest} from 'rxjs';
-import {take} from 'rxjs/operators';
 import AdminBox from '../../components/Admin/AdminBox';
 import {HabitGoal} from '../../models/HabitGoal';
 import {ListGoal} from '../../models/ListGoal';
 import {NumberGoal} from '../../models/NumberGoal';
 import {useAuth0} from "@auth0/auth0-react";
-import {ServiceContext} from "../../index";
+import HttpClient from "../../clients/HttpClient";
+import User from "../../models/User";
 
 interface Props {
     showCreateModal: Function;
@@ -20,42 +19,27 @@ interface Props {
 
 const Home: React.FC<Props> = (props) => {
     const {isAuthenticated} = useAuth0();
-    const {goalService, userService} = useContext(ServiceContext);
 
     const [userBoxes, setUserBoxes] = useState([] as JSX.Element[]);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        let userBoxes: JSX.Element[] = [];
+        const loadUserBoxers = async () => {
+            let httpClient = new HttpClient();
+            let userBoxes: JSX.Element[] = [];
+            let users = await httpClient.get<User[]>(`/api/User/`);
 
-        userService
-            .getUsers()
-            .subscribe(users => {
-                let overviewTasks: Observable<GoalOverview[]>[] = [];
-                users.forEach(user => {
-                    overviewTasks.push(
-                        goalService
-                            .loadGoalOverviews(user.Username)
-                            .pipe(take(1))
-                    )
-                })
+            await Promise.all(users.map(async (user) => {
+                const overviews = await httpClient.get<GoalOverview[]>(`/api/Goals/${user.Username}`);
+                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overviews}/>);
+            }))
 
-                combineLatest(overviewTasks)
-                    .subscribe(overviews => {
-                        overviews.forEach(overview => {
-                            if (overview.length !== 0) {
-                                const userId = overview[0].UserId;
-                                const user = users.filter(u => u.UserId === userId)[0];
+            setUserBoxes(userBoxes);
+            setLoading(false);
+        }
 
-                                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overview}/>);
-                            }
-                        })
-
-                        setUserBoxes(userBoxes);
-                        setLoading(false);
-                    })
-            });
-    })
+        loadUserBoxers()
+    }, [])
 
     const {showCreateModal, logHabitModal, logListModal, logNumberModal} = props;
 

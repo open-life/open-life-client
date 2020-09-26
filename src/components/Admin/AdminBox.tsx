@@ -3,7 +3,8 @@ import {HabitGoal} from "../../models/HabitGoal";
 import {ListGoal, Progress} from "../../models/ListGoal";
 import {NumberGoal} from "../../models/NumberGoal";
 import './AdminBox.css';
-import {ServiceContext} from "../../index";
+import HttpClient from "../../clients/HttpClient";
+import {CurrentUserContext} from "../../App";
 
 interface Props {
     showCreateModal: Function;
@@ -13,36 +14,54 @@ interface Props {
 }
 
 const AdminBox: React.FC<Props> = (props) => {
-    const {goalService} = useContext(ServiceContext);
-
     const [habitGoals, setHabitGoals] = useState([] as HabitGoal[]);
     const [listGoals, setListGoals] = useState([] as ListGoal[]);
     const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
+    const [loading, setLoading] = useState(true);
 
     const {showCreateModal, logHabitModal, logListModal, logNumberModal} = props;
 
+    const currentUser = useContext(CurrentUserContext);
+    const httpClient = new HttpClient();
+
     useEffect(() => {
-        goalService.HabitGoals.subscribe(value => setHabitGoals(value));
-        goalService.ListGoals.subscribe(value => setListGoals(value));
-        goalService.NumberGoals.subscribe(value => setNumberGoals(value));
-    }, [])
+        if (!currentUser.Username) {
+            return
+        }
+
+        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${currentUser.Username}`);
+        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${currentUser.Username}`);
+        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${currentUser.Username}`);
+
+        Promise.all([habits, lists, numbers])
+            .then(values => {
+                setHabitGoals(values[0]);
+                setListGoals(values[1]);
+                setNumberGoals(values[2]);
+                setLoading(false);
+            });
+    }, [currentUser])
+
+    if (loading) {
+        return <></>;
+    }
 
     const loadGoalRows = (): JSX.Element[] => {
         let goalRows: JSX.Element[] = [];
 
         habitGoals.forEach(g => {
             const progress = g.Logs.filter(l => l.HabitCompleted).length;
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logHabitModal(g), () => goalService.deleteHabitGoal(g.HabitGoalId)));
+            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logHabitModal(g), () => httpClient.delete(`/api/HabitGoal/${g.HabitGoalId}`)));
         });
 
         listGoals.forEach(g => {
             const progress = g.Items.filter(i => i.Progress === Progress.Completed).length;
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logListModal(g), () => goalService.deleteListGoal(g.ListGoalId)));
+            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logListModal(g), () => httpClient.delete(`/api/ListGoal/${g.ListGoalId}`)));
         });
 
         numberGoals.forEach(g => {
             const progress = g.Logs.map(l => l.Amount).reduce((a, b) => a + b, 0);
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logNumberModal(g), () => goalService.deleteNumberGoal(g.NumberGoalId)));
+            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logNumberModal(g), () => httpClient.delete(`/api/NumberGoal/${g.NumberGoalId}`)));
         });
 
         return goalRows;

@@ -1,7 +1,7 @@
-import React, {ChangeEvent, useContext, useState} from "react";
+import React, {useState} from "react";
 import DatePicker from "react-datepicker";
 import {HabitGoal, HabitLog} from "../../models/HabitGoal";
-import {ServiceContext} from "../../index";
+import HttpClient from "../../clients/HttpClient";
 
 interface Props {
     goal: HabitGoal;
@@ -9,14 +9,21 @@ interface Props {
 }
 
 const LogHabit: React.FC<Props> = (props) => {
-    const {goalService} = useContext(ServiceContext);
     const [date, setDate] = useState(new Date());
     const {goal, closeModal} = props;
 
+    const httpClient = new HttpClient();
+
     const save = (): void => {
-        closeModal();
-        goalService.saveHabitLog(new HabitLog(goal.HabitGoalId, date, true));
+        if(!goal.Logs){
+            goal.Logs = [];
+        }
+
+        goal.Logs.push(new HabitLog(goal.HabitGoalId, date, true));
+        httpClient.put<HabitGoal>(`/api/HabitGoal/${goal.HabitGoalId}`, goal);
+
         setDate(new Date());
+        closeModal();
     }
 
     return (
@@ -26,7 +33,7 @@ const LogHabit: React.FC<Props> = (props) => {
                 <label className="label">Date</label>
                 <div className="control">
                     <DatePicker className="input" selected={date}
-                                onChange={(event: ChangeEvent<HTMLInputElement>) => setDate(new Date(event.target.value))}/>
+                                onChange={date => setDate(date as Date)}/>
                 </div>
             </div>
             <span className="button is-link" onClick={() => save()}>Habit Completed</span>

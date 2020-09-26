@@ -1,20 +1,20 @@
-import React, {ChangeEvent, useContext, useState} from "react";
+import React, {useContext, useState} from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import {HabitGoal} from "../models/HabitGoal";
 import {NumberGoal} from "../models/NumberGoal";
 import Input from "../components/Input";
 import {ListGoal} from "../models/ListGoal";
-import {useAuth0} from "@auth0/auth0-react";
-import {ServiceContext} from "../index";
+import HttpClient from "../clients/HttpClient";
+import {CurrentUserContext} from "../App";
 
 interface Props {
     closeModal: Function;
 }
 
 const CreateGoal: React.FC<Props> = (props) => {
-    const {user} = useAuth0();
-    const {goalService} = useContext(ServiceContext);
+    const currentUser = useContext(CurrentUserContext);
+    const httpClient = new HttpClient();
 
     const [goalType, setGoalType] = useState('Habit');
     const [name, setName] = useState('');
@@ -25,20 +25,39 @@ const CreateGoal: React.FC<Props> = (props) => {
 
     const {closeModal} = props;
 
+    const resetModal = () => {
+        setGoalType('Habit');
+        setName('');
+        setStartDate(new Date());
+        setEndDate(new Date());
+        setGoalAmount(0);
+        setListName('');
+    }
+
     const saveGoal = () => {
         switch (goalType) {
             case 'Habit':
-                goalService.saveHabitGoal(new HabitGoal(name, startDate, endDate, user.UserId));
+                httpClient.post<HabitGoal>('/api/HabitGoal', new HabitGoal(name, startDate, endDate, currentUser.UserId))
+                    .then(() => {
+                        closeModal();
+                        resetModal();
+                    });
                 break;
             case 'Number':
-                goalService.saveNumberGoal(new NumberGoal(name, startDate, endDate, goalAmount, user.UserId));
+                httpClient.post<NumberGoal>('/api/NumberGoal', new NumberGoal(name, startDate, endDate, goalAmount, currentUser.UserId))
+                    .then(() => {
+                        closeModal();
+                        resetModal();
+                    });
                 break;
             case 'List':
-                goalService.saveListGoal(new ListGoal(name, listName, startDate, endDate, goalAmount, user.UserId));
+                httpClient.post<ListGoal>('/api/ListGoal', new ListGoal(name, listName, startDate, endDate, goalAmount, currentUser.UserId))
+                    .then(() => {
+                        closeModal();
+                        resetModal();
+                    });
                 break;
         }
-
-        closeModal();
     }
 
     const goalAmountInput = <Input key="goalAmount" handleChange={event => setGoalAmount(Number(event.target.value))}
@@ -81,14 +100,14 @@ const CreateGoal: React.FC<Props> = (props) => {
                 <label className="label">Start Date</label>
                 <div className="control">
                     <DatePicker className="input" selected={startDate}
-                                onChange={(event: ChangeEvent<HTMLInputElement>) => setStartDate(new Date(event.target.value))}/>
+                                onChange={date => setStartDate(date as Date)}/>
                 </div>
             </div>
             <div className="field">
                 <label className="label">End Date</label>
                 <div className="control">
                     <DatePicker className="input" selected={endDate}
-                                onChange={(event: ChangeEvent<HTMLInputElement>) => setEndDate(new Date(event.target.value))}/>
+                                onChange={date => setEndDate(date as Date)}/>
                 </div>
             </div>
             {goalSpecificFields}

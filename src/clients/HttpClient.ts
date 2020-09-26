@@ -1,25 +1,27 @@
-import { Observable, from } from "rxjs";
+import config from '../app_config.json';
 
 export default class HttpClient {
-
-    private _token: string;
+    private readonly _token: string;
 
     constructor(token: string = '') {
         this._token = token;
     }
 
-    get<T>(url: string): Observable<T> {
-        return from(fetch(url, { mode: 'cors', headers: { 'Access-Control-Allow-Origin': '*', 'Authorization': `Bearer ${this._token}` } })
+    get<T>(url: string): Promise<T> {
+        return fetch(config.api_url + url, {
+            mode: 'cors',
+            headers: {'Access-Control-Allow-Origin': '*', 'Authorization': `Bearer ${this._token}`}
+        })
             .then(function (response) {
                 if (response.status !== 200) {
                     return null as unknown as T;
                 }
-                return response.json();
-            }));
+                return response.json() as Promise<T>;
+            });
     }
 
-    post<T>(url: string, body: T): Observable<T> {
-        return from(fetch(url, {
+    post<T>(url: string, body: T): Promise<T> {
+        return fetch(config.api_url + url, {
             method: 'POST',
             mode: 'cors',
             cache: 'no-cache',
@@ -34,13 +36,12 @@ export default class HttpClient {
             body: JSON.stringify(body),
         })
             .then(response => {
-                console.log(response);
                 return response.json() as Promise<T>;
-            }));
+            });
     }
 
-    put<T>(url: string, body: T): Observable<T> {
-        return from(fetch(url, {
+    put<T>(url: string, body: T): Promise<T> {
+        return fetch(config.api_url + url, {
             method: 'PUT',
             mode: 'cors',
             cache: 'no-cache',
@@ -56,11 +57,11 @@ export default class HttpClient {
         })
             .then(response => {
                 return response.json() as Promise<T>;
-            }));
+            });
     }
 
-    patch<T>(url: string, body: T): Observable<T> {
-        return from(fetch(url, {
+    patch<T>(url: string, body: T): Promise<T> {
+        return fetch(config.api_url + url, {
             method: 'PATCH',
             mode: 'cors',
             cache: 'no-cache',
@@ -76,11 +77,11 @@ export default class HttpClient {
         })
             .then(response => {
                 return response.json() as Promise<T>;
-            }));
+            });
     }
 
     delete(url: string): void {
-        fetch(url, {
+        fetch(config.api_url + url, {
             method: 'DELETE',
             mode: 'cors',
             cache: 'no-cache',

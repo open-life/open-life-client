@@ -9,16 +9,13 @@ import GoalOverview from '../../models/GoalOverview';
 import {ListGoal} from '../../models/ListGoal';
 import {NumberGoal} from '../../models/NumberGoal';
 import {RouteComponentProps} from 'react-router';
-import {combineLatest} from 'rxjs';
 import User from '../../models/User';
-import {ServiceContext} from "../../index";
+import HttpClient from "../../clients/HttpClient";
 
 interface Props extends RouteComponentProps<{ [s: string]: string; }> {
 }
 
 const Profile: React.FC<Props> = (props) => {
-    const {userService, goalService} = useContext(ServiceContext);
-
     const profilePicUpload = React.createRef<HTMLInputElement>();
 
     const {match} = props;
@@ -29,6 +26,8 @@ const Profile: React.FC<Props> = (props) => {
     const [habitGoals, setHabitGoals] = useState([] as HabitGoal[]);
     const [listGoals, setListGoals] = useState([] as ListGoal[]);
     const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
+
+    const httpClient = new HttpClient();
 
     const buildProfilePic = (): JSX.Element => {
         if (user && (user.ImageUrl === '' || !user.ImageUrl)) {
@@ -111,37 +110,37 @@ const Profile: React.FC<Props> = (props) => {
     }
 
     useEffect(() => {
-        combineLatest([
-            userService.getUserWithUsername(match.params.username),
-            goalService.GoalOverViews,
-            goalService.HabitGoals,
-            goalService.ListGoals,
-            goalService.NumberGoals]
-        )
-            .subscribe(state => {
-                setUser(state[0]);
-                setGoalOverviews(state[1]);
-                setHabitGoals(state[2]);
-                setListGoals(state[3]);
-                setNumberGoals(state[4]);
-            })
+        httpClient.get<User>(`/api/User/username/${match.params.username}`)
+            .then(user => setUser(user))
+    }, [match])
 
-        goalService
-            .loadUserGoals(match.params.username)
-            .subscribe(() => setLoading(false));
-    }, [match.params.username])
+    useEffect(() => {
+        if(!user || !user.Username){
+            return
+        }
+
+        const overviews = httpClient.get<GoalOverview[]>(`/api/Goals/${user.Username}`);
+        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${user.Username}`);
+        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${user.Username}`);
+        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${user.Username}`);
+
+        Promise.all([overviews, habits, lists, numbers])
+            .then(values => {
+                setGoalOverviews(values[0]);
+                setHabitGoals(values[1]);
+                setListGoals(values[2]);
+                setNumberGoals(values[3]);
+                setLoading(false);
+            });
+    }, [user])
+
+    if (loading) {
+        return <></>
+    }
 
     const profilePic = buildProfilePic();
     const header = buildHeader(profilePic);
     const goals = buildGoals();
-
-    if (loading) {
-        return (
-            <div>
-                {header}
-            </div>
-        );
-    }
 
     return (
         <div>

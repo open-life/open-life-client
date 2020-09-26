@@ -1,8 +1,8 @@
-import React, {useContext, useState} from "react";
+import React, {useState} from "react";
 import {ListGoal, ListItem, Progress} from "../../models/ListGoal";
 import Input from "../../components/Input";
 import MultiSelect from "../../components/MultiSelect";
-import {ServiceContext} from "../../index";
+import HttpClient from "../../clients/HttpClient";
 
 interface Props {
     goal: ListGoal;
@@ -10,15 +10,22 @@ interface Props {
 }
 
 const LogList: React.FC<Props> = (props) => {
-    const {goalService} = useContext(ServiceContext);
     const [itemName, setItemName] = useState('');
     const [itemProgress, setItemProgress] = useState(Progress.InProgress);
 
     const {goal, closeModal} = props;
 
+    const httpClient = new HttpClient();
+
     const save = (): void => {
+        if(!goal.Items){
+            goal.Items = [];
+        }
+
+        goal.Items.push(new ListItem(goal.ListGoalId, itemName, itemProgress));
+        httpClient.put<ListGoal>(`/api/ListGoal/${goal.ListGoalId}`, goal);
+
         closeModal();
-        goalService.saveListItem(new ListItem(goal.ListGoalId, itemName, itemProgress));
         setItemName('');
         setItemProgress(Progress.InProgress);
     }
