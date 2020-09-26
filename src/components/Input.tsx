@@ -1,22 +1,23 @@
-import React, { ChangeEvent } from "react";
+import React, {ChangeEvent} from "react";
 
 interface Props {
-    name: string;
     label: string;
     placeholder: string;
-    handleChange: (event: ChangeEvent) => void;
-};
-interface State { };
-
-export default class Input extends React.Component<Props, State> {
-    render() {
-        return (
-            <div className="field">
-                <label className="label">{this.props.label}</label>
-                <div className="control">
-                    <input name={this.props.name} className="input" type="text" placeholder={this.props.placeholder} onChange={this.props.handleChange} />
-                </div>
-            </div>
-        );
-    }
+    handleChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
+
+const Input: React.FC<Props> = (props) => {
+    const {label, placeholder, handleChange} = props;
+
+    return (
+        <div className="field">
+            <label className="label">{label}</label>
+            <div className="control">
+                <input className="input" type="text" placeholder={placeholder}
+                       onChange={handleChange}/>
+            </div>
+        </div>
+    );
+}
+
+export default Input;

@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useEffect, useState} from 'react';
+import React, {ChangeEvent, useContext, useEffect, useState} from 'react';
 import './Profile.css';
 import Overview from '../../components/Goals/Overview/Overview';
 import DailyTracker from '../../components/Goals/DailyTracker/DailyTracker';
@@ -8,21 +8,17 @@ import {HabitGoal} from '../../models/HabitGoal';
 import GoalOverview from '../../models/GoalOverview';
 import {ListGoal} from '../../models/ListGoal';
 import {NumberGoal} from '../../models/NumberGoal';
-import UserService from '../../services/UserService';
 import {RouteComponentProps} from 'react-router';
 import {combineLatest} from 'rxjs';
-import GoalService from '../../services/GoalService';
 import User from '../../models/User';
-import {useAuth0} from "@auth0/auth0-react";
+import {ServiceContext} from "../../index";
 
 interface Props extends RouteComponentProps<{ [s: string]: string; }> {
 }
 
 const Profile: React.FC<Props> = (props) => {
-    const {getAccessTokenSilently} = useAuth0();
+    const {userService, goalService} = useContext(ServiceContext);
 
-    const goalService = new GoalService();
-    const userService = new UserService();
     const profilePicUpload = React.createRef<HTMLInputElement>();
 
     const {match} = props;
@@ -64,8 +60,8 @@ const Profile: React.FC<Props> = (props) => {
         if (target) {
             const files = target.files;
             if (files) {
-                const token = getAccessTokenSilently();
-                const userService = new UserService(await token);
+                // const token = getAccessTokenSilently();
+                // const userService = new UserService(await token);
                 //userService.postProfilePicture("FIx this");
             }
         }

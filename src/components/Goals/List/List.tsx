@@ -1,31 +1,34 @@
 import React from 'react';
-import { ListGoal } from '../../../models/ListGoal';
+import {ListGoal} from '../../../models/ListGoal';
 
 interface ListProps {
-  goal: ListGoal;
-};
+    goal: ListGoal;
+}
 
-interface ListState { };
+const List: React.FC<ListProps> = (props) => {
+    const {goal} = props;
 
-export default class List extends React.Component<ListProps, ListState> {
-  render() {
-    const rows = this.props.goal.Items ? this.props.goal.Items.map(i => <tr key={i.ListItemId}><td>{i.Name}</td><td>{i.Progress}</td></tr>) : null;
+    const rows = goal.Items ? goal.Items.map(i => <tr key={i.ListItemId}>
+        <td>{i.Name}</td>
+        <td>{i.Progress}</td>
+    </tr>) : null;
 
     return (
-      <div className="box">
-        <h5 className="title is-5">{this.props.goal.Name}</h5>
-        <table className="table is-fullwidth">
-          <thead>
-            <tr>
-              <th>Item</th>
-              <th>Progress</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rows}
-          </tbody>
-        </table>
-      </div>
+        <div className="box">
+            <h5 className="title is-5">{goal.Name}</h5>
+            <table className="table is-fullwidth">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Progress</th>
+                </tr>
+                </thead>
+                <tbody>
+                {rows}
+                </tbody>
+            </table>
+        </div>
     )
-  }
 }
+
+export default List;

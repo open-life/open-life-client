@@ -1,50 +1,37 @@
-import React from "react";
+import React, {ChangeEvent, useContext, useState} from "react";
 import DatePicker from "react-datepicker";
-import { HabitGoal, HabitLog } from "../../models/HabitGoal";
-import { Auth0Context } from "../../components/Authentication/Auth0";
+import {HabitGoal, HabitLog} from "../../models/HabitGoal";
+import {ServiceContext} from "../../index";
 
 interface Props {
     goal: HabitGoal;
     closeModal: Function;
 }
 
-interface State {
-    date: Date;
-}
+const LogHabit: React.FC<Props> = (props) => {
+    const {goalService} = useContext(ServiceContext);
+    const [date, setDate] = useState(new Date());
+    const {goal, closeModal} = props;
 
-export default class LogHabit extends React.Component<Props, State> {
-    constructor(props: Readonly<Props>) {
-        super(props);
-
-        this.state = { date: new Date() };
-
-        this.setDate = this.setDate.bind(this);
+    const save = (): void => {
+        closeModal();
+        goalService.saveHabitLog(new HabitLog(goal.HabitGoalId, date, true));
+        setDate(new Date());
     }
 
-    render() {
-        return (
-            <div className="box">
-                <h4 className="title is-4">Log Habit - {this.props.goal.Name}</h4>
-                <div className="field">
-                    <label className="label">Date</label>
-                    <div className="control">
-                        <DatePicker className="input" selected={this.state.date} onChange={this.setDate} />
-                    </div>
+    return (
+        <div className="box">
+            <h4 className="title is-4">Log Habit - {goal.Name}</h4>
+            <div className="field">
+                <label className="label">Date</label>
+                <div className="control">
+                    <DatePicker className="input" selected={date}
+                                onChange={(event: ChangeEvent<HTMLInputElement>) => setDate(new Date(event.target.value))}/>
                 </div>
-                <span className="button is-link" onClick={() => this.save()}>Habit Completed</span>
             </div>
-        )
-    }
-
-    setDate(date: Date): void {
-        this.setState({ date: date });
-    }
-
-    save(): void {
-        this.props.closeModal();
-        this.context.userGoals.saveHabitLog(new HabitLog(this.props.goal.HabitGoalId, this.state.date, true));
-        this.setState({ date: new Date() });
-    }
+            <span className="button is-link" onClick={() => save()}>Habit Completed</span>
+        </div>
+    )
 }
 
-LogHabit.contextType = Auth0Context;
+export default LogHabit;

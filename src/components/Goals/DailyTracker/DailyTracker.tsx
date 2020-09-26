@@ -1,42 +1,26 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import SVG from 'svg.js';
-import { HabitGoal } from '../../../models/HabitGoal';
+import {HabitGoal} from '../../../models/HabitGoal';
 
 interface DailyTrackerProps {
     goal: HabitGoal;
-};
+}
 
-interface DailyTrackerState { };
+const DailyTracker: React.FC<DailyTrackerProps> = (props) => {
+    const {goal} = props;
 
-export default class DailyTracker extends React.Component<DailyTrackerProps, DailyTrackerState> {
-    constructor(props: DailyTrackerProps) {
-        super(props);
+    useEffect(() => {
+        const daysArray = buildDaysArray(goal);
+        dailyTracker(daysArray);
+    }, [goal])
 
-        this.buildDaysArray = this.buildDaysArray.bind(this);
-        this.dailyTracker = this.dailyTracker.bind(this);
-    }
-
-    render() {
-        return (
-            <div className="box">
-                <h5 className="title is-5">{this.props.goal.Name}</h5>
-                <div id={this.props.goal.Name.replace(/\s/g, '')}></div>
-            </div>
-        )
-    }
-
-    componentDidMount() {
-        const daysArray = this.buildDaysArray(this.props.goal);
-        this.dailyTracker(daysArray);
-    }
-
-    buildDaysArray(goal: HabitGoal): number[] {
+    const buildDaysArray = (goal: HabitGoal): number[] => {
         let days: number[] = [];
-        let currentDate = this.removeTime(goal.StartDate);
+        let currentDate = removeTime(goal.StartDate);
 
         if (goal.Logs && goal.Logs.length !== 0) {
-            for (var i = 0; i < goal.Target; i++) {
-                let log = goal.Logs.find(l => this.compareDates(this.removeTime(l.Date), currentDate) && l.HabitCompleted);
+            for (let i = 0; i < goal.Target; i++) {
+                let log = goal.Logs.find(l => compareDates(removeTime(l.Date), currentDate) && l.HabitCompleted);
                 if (log) {
                     days.push(1);
                 } else {
@@ -52,22 +36,22 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
         return days;
     }
 
-    private removeTime(date: Date): Date {
+    const removeTime = (date: Date): Date => {
         date = new Date(date);
         return new Date(date.getFullYear(), date.getMonth(), date.getDate());
     }
 
-    private compareDates(date1: Date, date2: Date): boolean {
+    const compareDates = (date1: Date, date2: Date): boolean => {
         return date1.getTime() === date2.getTime();
     }
 
-    dailyTracker(days: number[]) {
-        var draw = SVG(this.props.goal.Name.replace(/\s/g, '')).size('100%', '100%');
+    const dailyTracker = (days: number[]) => {
+        const draw = SVG(goal.Name.replace(/\s/g, '')).size('100%', '100%');
         let width = draw.parent().offsetWidth;
 
         let x = 0;
         let y = 0;
-        for (var i = 0; i < days.length; i++) {
+        for (let i = 0; i < days.length; i++) {
             if (x + 21 > width) {
                 x = 0;
                 y += 23;
@@ -80,10 +64,19 @@ export default class DailyTracker extends React.Component<DailyTrackerProps, Dai
                 fill = '#d3d3d3';
             }
 
-            draw.rect(21, 21).attr({ x: x, y: y, fill: fill });
+            draw.rect(21, 21).attr({x: x, y: y, fill: fill});
             x = x + 23;
         }
 
         draw.height(y + 23);
     }
+
+    return (
+        <div className="box">
+            <h5 className="title is-5">{goal.Name}</h5>
+            <div id={goal.Name.replace(/\s/g, '')}/>
+        </div>
+    )
 }
+
+export default DailyTracker;

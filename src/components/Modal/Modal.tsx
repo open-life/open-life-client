@@ -1,21 +1,22 @@
 import React from 'react';
 
 interface Props {
-    Active: boolean;
+    active: boolean;
     closeModal: Function;
-};
-interface State { };
-
-export default class Modal extends React.Component<Props, State> {
-    render() {
-        return (
-            <div className={`modal ${this.props.Active ? 'is-active' : ''}`}>
-                <div className="modal-background" onClick={() => this.props.closeModal()}></div>
-                <div className="modal-content">
-                    {this.props.children}
-                </div>
-                <button className="modal-close is-large" aria-label="close" onClick={() => this.props.closeModal()}></button>
-            </div>
-        );
-    }
 }
+
+const Modal: React.FC<Props> = (props) => {
+    const {active, closeModal, children} = props;
+
+    return (
+        <div className={`modal ${active ? 'is-active' : ''}`}>
+            <div className="modal-background" onClick={() => closeModal()}/>
+            <div className="modal-content">
+                {children}
+            </div>
+            <button className="modal-close is-large" aria-label="close" onClick={() => closeModal()}/>
+        </div>
+    );
+}
+
+export default Modal;

@@ -1,9 +1,7 @@
-import React, {useEffect, useState} from 'react';
+import React, {useContext, useEffect, useState} from 'react';
 import './Home.css';
 import UserBox from '../../components/UserBox/UserBox';
 import GoalOverview from '../../models/GoalOverview';
-import GoalService from '../../services/GoalService';
-import UserService from '../../services/UserService';
 import {Observable, combineLatest} from 'rxjs';
 import {take} from 'rxjs/operators';
 import AdminBox from '../../components/Admin/AdminBox';
@@ -11,6 +9,7 @@ import {HabitGoal} from '../../models/HabitGoal';
 import {ListGoal} from '../../models/ListGoal';
 import {NumberGoal} from '../../models/NumberGoal';
 import {useAuth0} from "@auth0/auth0-react";
+import {ServiceContext} from "../../index";
 
 interface Props {
     showCreateModal: Function;
@@ -21,9 +20,7 @@ interface Props {
 
 const Home: React.FC<Props> = (props) => {
     const {isAuthenticated} = useAuth0();
-
-    const goalService = new GoalService();
-    const userService = new UserService();
+    const {goalService, userService} = useContext(ServiceContext);
 
     const [userBoxes, setUserBoxes] = useState([] as JSX.Element[]);
     const [loading, setLoading] = useState(false);

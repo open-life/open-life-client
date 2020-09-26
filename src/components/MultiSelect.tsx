@@ -1,32 +1,31 @@
-import React, { ChangeEvent } from "react";
+import React, {ChangeEvent} from "react";
 
 interface Props {
     name: string;
     label: string;
     options: string[];
 
-    handleChange: (event: ChangeEvent) => void;
-};
-interface State { };
+    handleChange: (event: ChangeEvent<HTMLSelectElement>) => void;
+}
 
-export default class MultiSelect extends React.Component<Props, State> {
-    render() {
-        let options: JSX.Element[] = [];
+const MultiSelect: React.FC<Props> = (props) => {
+    const {name, label, options, handleChange} = props;
 
-        this.props.options.forEach(o => options.push(<option key={o}>{o}</option>));
-        options.unshift(<option key="_theBlankOne"></option>);
+    let elements = options.map(o => <option key={o}>{o}</option>);
+    elements.unshift(<option key="_theBlankOne"/>);
 
-        return (
-            <div className="field">
-                <label className="label">{this.props.label}</label>
-                <div className="control">
-                    <div className="select">
-                        <select name={this.props.name} onChange={this.props.handleChange}>
-                            {options}
-                        </select>
-                    </div>
+    return (
+        <div className="field">
+            <label className="label">{label}</label>
+            <div className="control">
+                <div className="select">
+                    <select name={name} onChange={handleChange}>
+                        {elements}
+                    </select>
                 </div>
             </div>
-        );
-    }
+        </div>
+    );
 }
+
+export default MultiSelect;
