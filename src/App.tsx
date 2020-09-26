@@ -1,120 +1,85 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import './App.css';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
+import {BrowserRouter as Router, Route} from 'react-router-dom';
 import NavBar from './components/NavBar/NavBar';
 import Profile from './pages/Profile/Profile';
 import Home from './pages/Home/Home';
 import Modal from './components/Modal/Modal';
 import CreateGoal from './modals/CreateGoal';
 import GoalOverview from './models/GoalOverview';
-import { Observable } from 'rxjs';
-import { HabitGoal } from './models/HabitGoal';
-import { ListGoal } from './models/ListGoal';
-import { NumberGoal } from './models/NumberGoal';
-import { takeWhile } from 'rxjs/operators';
-import { Auth0Context } from './components/Authentication/Auth0';
+import {HabitGoal} from './models/HabitGoal';
+import {ListGoal} from './models/ListGoal';
+import {NumberGoal} from './models/NumberGoal';
 import LogHabit from './modals/Log/LogHabit';
 import LogList from './modals/Log/LogList';
 import LogNumber from './modals/Log/LogNumber';
+import {useAuth0} from "@auth0/auth0-react";
+import GoalService from "./services/GoalService";
 
-interface AppProps { };
-interface AppState {
-  dataLoaded: boolean;
-  modal: JSX.Element;
-  modalActive: boolean;
+const App: React.FC = () => {
+    const [dataLoaded, setDataLoaded] = useState(false);
+    const [modal, setModal] = useState(<div/>);
+    const [modalActive, setModalActive] = useState(false);
+    const [goalOverviews, setGoalOverviews] = useState([] as GoalOverview[]);
+    const [habitGoals, setHabitGoals] = useState([] as HabitGoal[]);
+    const [listGoals, setListGoals] = useState([] as ListGoal[]);
+    const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
 
-  goalOverviews: GoalOverview[];
-  habitGoals: HabitGoal[];
-  listGoals: ListGoal[];
-  numberGoals: NumberGoal[];
-};
+    const {user, isAuthenticated} = useAuth0();
 
-export default class App extends React.Component<AppProps, AppState> {
-  private appAlive: boolean;
+    const showCreateModal = (): void => {
+        setModalActive(true);
+        setModal(<CreateGoal closeModal={() => setModalActive(false)}/>);
+    }
 
-  constructor(props: AppProps) {
-    super(props);
-    this.state = { dataLoaded: false, modal: <div></div>, modalActive: false, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
+    const logHabitModal = (habitGoal: HabitGoal): void => {
+        setModalActive(true);
+        setModal(<LogHabit goal={habitGoal} closeModal={() => setModalActive(false)}/>);
+    }
 
-    this.showCreateModal = this.showCreateModal.bind(this);
-    this.logHabitModal = this.logHabitModal.bind(this);
-    this.logListModal = this.logListModal.bind(this);
-    this.logNumberModal = this.logNumberModal.bind(this);
-    this.closeModal = this.closeModal.bind(this);
-    this.loadData = this.loadData.bind(this);
-    this.loadStatePiece = this.loadStatePiece.bind(this);
+    const logListModal = (listGoal: ListGoal): void => {
+        setModalActive(true);
+        setModal(<LogList goal={listGoal} closeModal={() => setModalActive(false)}/>);
+    }
 
-    this.appAlive = true;
-  }
+    const logNumberModal = (numberGoal: NumberGoal): void => {
+        setModalActive(true);
+        setModal(<LogNumber goal={numberGoal} closeModal={() => setModalActive(false)}/>);
+    }
 
-  render() {
-    return (
-      <Router>
-        <NavBar />
-        <Route path='/' exact render={(props) => <Home {...props} showCreateModal={this.showCreateModal} logHabitModal={this.logHabitModal} logListModal={this.logListModal} logNumberModal={this.logNumberModal} />} />
-        <Route path='/:username' exact render={(props) => <Profile {...props} />} />
-        {this.context.isAuthenticated &&
-          <Modal Active={this.state.modalActive} closeModal={this.closeModal}>
-            {this.state.modal}
-          </Modal>
+    const loadData = (username: string): void => {
+        const goalService = new GoalService();
+
+        goalService.loadUserGoals(username).subscribe();
+        goalService.GoalOverViews.subscribe(goalOverviews => setGoalOverviews(goalOverviews));
+        goalService.HabitGoals.subscribe(habitGoals => setHabitGoals(habitGoals));
+        goalService.ListGoals.subscribe(listGoals => setListGoals(listGoals));
+        goalService.NumberGoals.subscribe(numberGoals => setNumberGoals(numberGoals));
+
+        setDataLoaded(true);
+    }
+
+    useEffect(() => {
+        if (user && user.Username && !dataLoaded) {
+            loadData(user.Username);
         }
-      </Router>
+    }, [user, dataLoaded])
+
+    return (
+        <Router>
+            <NavBar/>
+            <Route path='/' exact render={(props) => <Home {...props} showCreateModal={showCreateModal}
+                                                           logHabitModal={logHabitModal}
+                                                           logListModal={logListModal}
+                                                           logNumberModal={logNumberModal}/>}/>
+            <Route path='/:username' exact render={(props) => <Profile {...props} />}/>
+            {isAuthenticated &&
+            <Modal Active={modalActive} closeModal={() => setModalActive(false)}>
+                {modal}
+            </Modal>
+            }
+        </Router>
     );
-  }
-
-  componentDidMount() {
-    if (this.context.user && this.context.user.Username) {
-      this.loadData(this.context.user.Username);
-    }
-  }
-
-  componentDidUpdate() {
-    const user = this.context.user;
-    if (user && user.Username && !this.state.dataLoaded) {
-      this.loadData(user.Username);
-    }
-  }
-
-  componentWillUnmount() {
-    this.appAlive = false;
-  }
-
-  showCreateModal(): void {
-    this.setState({ modalActive: true, modal: <CreateGoal closeModal={this.closeModal} /> });
-  }
-
-  logHabitModal(habitGoal: HabitGoal): void {
-    this.setState({ modalActive: true, modal: <LogHabit goal={habitGoal} closeModal={this.closeModal} /> });
-  }
-
-  logListModal(listGoal: ListGoal): void {
-    this.setState({ modalActive: true, modal: <LogList goal={listGoal} closeModal={this.closeModal} /> });
-  }
-
-  logNumberModal(numberGoal: NumberGoal): void {
-    this.setState({ modalActive: true, modal: <LogNumber goal={numberGoal} closeModal={this.closeModal} /> });
-  }
-
-  closeModal(): void {
-    this.setState({ modalActive: false });
-  }
-
-  private loadData(username: string): void {
-    this.setState({ dataLoaded: true });
-    const userGoals = this.context.userGoals;
-
-    userGoals.loadUserGoals(username).subscribe();
-    this.loadStatePiece<GoalOverview[]>(userGoals.GoalOverViews, 'goalOverviews');
-    this.loadStatePiece<HabitGoal[]>(userGoals.HabitGoals, 'habitGoals');
-    this.loadStatePiece<ListGoal[]>(userGoals.ListGoals, 'listGoals');
-    this.loadStatePiece<NumberGoal[]>(userGoals.NumberGoals, 'numberGoals');
-  }
-
-  private loadStatePiece<T>(loader: Observable<T>, stateKey: string) {
-    loader
-      .pipe(takeWhile(() => this.appAlive))
-      .subscribe(value => this.setState({ [stateKey]: value } as unknown as AppState));
-  }
 }
 
-App.contextType = Auth0Context;
+export default App;
