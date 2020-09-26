@@ -1,204 +1,174 @@
-import React, { ChangeEvent } from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import './Profile.css';
 import Overview from '../../components/Goals/Overview/Overview';
 import DailyTracker from '../../components/Goals/DailyTracker/DailyTracker';
 import List from '../../components/Goals/List/List';
 import Chart from '../../components/Goals/Chart/Chart';
-import { HabitGoal } from '../../models/HabitGoal';
+import {HabitGoal} from '../../models/HabitGoal';
 import GoalOverview from '../../models/GoalOverview';
-import { ListGoal } from '../../models/ListGoal';
-import { NumberGoal } from '../../models/NumberGoal';
-import { Auth0Context } from '../../components/Authentication/Auth0';
+import {ListGoal} from '../../models/ListGoal';
+import {NumberGoal} from '../../models/NumberGoal';
 import UserService from '../../services/UserService';
-import { RouteComponentProps } from 'react-router';
-import { combineLatest } from 'rxjs';
+import {RouteComponentProps} from 'react-router';
+import {combineLatest} from 'rxjs';
 import GoalService from '../../services/GoalService';
 import User from '../../models/User';
-import { takeWhile } from 'rxjs/operators';
+import {useAuth0} from "@auth0/auth0-react";
 
-interface Props extends RouteComponentProps<{ [s: string]: string; }> { };
-interface State {
-  loading: boolean;
-  user: User;
-
-  goalOverviews: GoalOverview[];
-  habitGoals: HabitGoal[];
-  listGoals: ListGoal[];
-  numberGoals: NumberGoal[];
-};
-
-export default class Profile extends React.Component<Props, State> {
-  private _appAlive: boolean;
-  private _goalService: GoalService;
-  private _userService: UserService;
-  private _profilePicUpload: React.RefObject<HTMLInputElement>;
-
-  constructor(props: Props) {
-    super(props);
-
-    this.state = { loading: true, user: {} as User, goalOverviews: [], habitGoals: [], listGoals: [], numberGoals: [] };
-
-    this._appAlive = true;
-    this._goalService = new GoalService();
-    this._userService = new UserService();
-    this._profilePicUpload = React.createRef();
-
-    this.buildHeader = this.buildHeader.bind(this);
-    this.buildProfilePic = this.buildProfilePic.bind(this);
-    this.buildGoals = this.buildGoals.bind(this);
-    this.uploadProfilePic = this.uploadProfilePic.bind(this);
-    this.saveProfilePic = this.saveProfilePic.bind(this);
-  }
-
-  render() {
-    const profilePic = this.buildProfilePic();
-    const header = this.buildHeader(profilePic);
-    const goals = this.buildGoals();
-
-    if (this.state.loading) {
-      return (
-        <div>
-          {header}
-        </div>
-      );
-    }
-
-    return (
-      <div>
-        {header}
-
-        <section className="section">
-          <div className="container has-text-centered">
-
-            <h2 className="title is-2">Goals</h2>
-            <Overview goals={this.state.goalOverviews.map(g => g.Name)}
-              status={this.state.goalOverviews.map(g => `${+(g.Progress / g.Target).toFixed(2)}%`)} />
-
-            {goals.habitGoals}
-
-            <div className="columns">
-              {goals.listGoals}
-            </div>
-
-            {goals.numberGoals}
-          </div>
-        </section>
-      </div>
-    );
-  }
-
-  buildProfilePic(): JSX.Element {
-    if (this.state.user && (this.state.user.ImageUrl === '' || !this.state.user.ImageUrl)) {
-      return (
-        <div className="add-avatar-image" onClick={() => this.uploadProfilePic()}>
-          <input id="fileInput" type="file" ref={this._profilePicUpload} style={{ display: 'none' }} onChange={this.saveProfilePic} />
-          <span className="icon is-large">
-            <i className="fas fa-3x fa-plus-circle"></i>
-          </span>
-        </div>
-      );
-    } else {
-      return <img alt="Profile Pic" className="is-rounded avatar-image" src={this.state.user.ImageUrl} />;
-    }
-  }
-
-  uploadProfilePic() {
-    const element = this._profilePicUpload.current;
-
-    if (element) {
-      element.click();
-    }
-  }
-
-  async saveProfilePic(e: ChangeEvent<HTMLInputElement>) {
-    const target = e.target;
-
-    if (target) {
-      const files = target.files;
-      if (files) {
-        const token = this.context.getTokenSilently();
-        const userService = new UserService(await token);
-        //userService.postProfilePicture("FIx this");
-      }
-    }
-  }
-
-  buildHeader(profilePic: JSX.Element): JSX.Element {
-    return (
-      <header>
-        <section className="info-strip">
-          <figure className="image avatar">
-            {profilePic}
-          </figure>
-          <div className="name-stats">
-            <h2 className="is-size-2 has-text-white name">{this.state.user.Name}</h2>
-            {this.state.goalOverviews.length !== 0 &&
-              <div className="stats">
-                <h2 className="is-size-2 has-text-white goals">{this.state.goalOverviews.length} goals</h2>
-              </div>
-            }
-          </div>
-        </section>
-      </header>
-    );
-  }
-
-  buildGoals(): { habitGoals: JSX.Element[], listGoals: JSX.Element[], numberGoals: JSX.Element[] } {
-    let habitGoals: JSX.Element[] = [];
-    this.state.habitGoals.forEach(g => {
-      habitGoals.push(<DailyTracker key={g.HabitGoalId} goal={g} />);
-    });
-
-    let listGoals: JSX.Element[] = [];
-    this.state.listGoals.forEach(g => {
-      listGoals.push(<div key={g.ListGoalId} className="column is-half"><List goal={g} /></div>);
-    });
-
-    let numberGoals: JSX.Element[] = [];
-    this.state.numberGoals.forEach(g => {
-      numberGoals.push(<Chart key={g.NumberGoalId} goal={g} />);
-    });
-
-    return { habitGoals: habitGoals, listGoals: listGoals, numberGoals: numberGoals };
-  }
-
-  componentDidMount() {
-    this.loadData();
-  }
-
-  componentDidUpdate(oldProps: Props, oldState: State) {
-    if (oldProps.match.params.username !== this.props.match.params.username) {
-      this.loadData();
-    }
-  }
-
-  componentWillUnmount() {
-    this._appAlive = false;
-  }
-
-  private loadData(): void {
-    this.setState({ loading: true });
-    this.loadState();
-    this._goalService
-      .loadUserGoals(this.props.match.params.username)
-      .subscribe(() => this.setState({ loading: false }));
-  }
-
-  private loadState() {
-    const service = this._goalService;
-
-    combineLatest(
-      this._userService.getUserWithUsername(this.props.match.params.username),
-      service.GoalOverViews,
-      service.HabitGoals,
-      service.ListGoals,
-      service.NumberGoals
-    )
-      .pipe(takeWhile(() => this._appAlive))
-      .subscribe(state => {
-        this.setState({ user: state[0], goalOverviews: state[1], habitGoals: state[2], listGoals: state[3], numberGoals: state[4] });
-      })
-  }
+interface Props extends RouteComponentProps<{ [s: string]: string; }> {
 }
 
-Profile.contextType = Auth0Context;
+const Profile: React.FC<Props> = (props) => {
+    const {getAccessTokenSilently} = useAuth0();
+
+    const goalService = new GoalService();
+    const userService = new UserService();
+    const profilePicUpload = React.createRef<HTMLInputElement>();
+
+    const {match} = props;
+
+    const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState({} as User);
+    const [goalOverviews, setGoalOverviews] = useState([] as GoalOverview[]);
+    const [habitGoals, setHabitGoals] = useState([] as HabitGoal[]);
+    const [listGoals, setListGoals] = useState([] as ListGoal[]);
+    const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
+
+    const buildProfilePic = (): JSX.Element => {
+        if (user && (user.ImageUrl === '' || !user.ImageUrl)) {
+            return (
+                <div className="add-avatar-image" onClick={() => uploadProfilePic()}>
+                    <input id="fileInput" type="file" ref={profilePicUpload} style={{display: 'none'}}
+                           onChange={saveProfilePic}/>
+                    <span className="icon is-large">
+            <i className="fas fa-3x fa-plus-circle"/>
+          </span>
+                </div>
+            );
+        } else {
+            return <img alt="Profile Pic" className="is-rounded avatar-image" src={user.ImageUrl}/>;
+        }
+    }
+
+    const uploadProfilePic = () => {
+        const element = profilePicUpload.current;
+
+        if (element) {
+            element.click();
+        }
+    }
+
+    const saveProfilePic = async (e: ChangeEvent<HTMLInputElement>) => {
+        const target = e.target;
+
+        if (target) {
+            const files = target.files;
+            if (files) {
+                const token = getAccessTokenSilently();
+                const userService = new UserService(await token);
+                //userService.postProfilePicture("FIx this");
+            }
+        }
+    }
+
+    const buildHeader = (profilePic: JSX.Element): JSX.Element => {
+        return (
+            <header>
+                <section className="info-strip">
+                    <figure className="image avatar">
+                        {profilePic}
+                    </figure>
+                    <div className="name-stats">
+                        <h2 className="is-size-2 has-text-white name">{user.Name}</h2>
+                        {goalOverviews.length !== 0 &&
+                        <div className="stats">
+                            <h2 className="is-size-2 has-text-white goals">{goalOverviews.length} goals</h2>
+                        </div>
+                        }
+                    </div>
+                </section>
+            </header>
+        );
+    }
+
+    const buildGoals = (): {
+        habitGoals: JSX.Element[],
+        listGoals: JSX.Element[],
+        numberGoals: JSX.Element[]
+    } => {
+        let habitGoalElements: JSX.Element[] = [];
+        habitGoals.forEach(g => {
+            habitGoalElements.push(<DailyTracker key={g.HabitGoalId} goal={g}/>);
+        });
+
+        let listGoalElements: JSX.Element[] = [];
+        listGoals.forEach(g => {
+            listGoalElements.push(<div key={g.ListGoalId} className="column is-half"><List goal={g}/></div>);
+        });
+
+        let numberGoalElements: JSX.Element[] = [];
+        numberGoals.forEach(g => {
+            numberGoalElements.push(<Chart key={g.NumberGoalId} goal={g}/>);
+        });
+
+        return {habitGoals: habitGoalElements, listGoals: listGoalElements, numberGoals: numberGoalElements};
+    }
+
+    useEffect(() => {
+        combineLatest([
+            userService.getUserWithUsername(match.params.username),
+            goalService.GoalOverViews,
+            goalService.HabitGoals,
+            goalService.ListGoals,
+            goalService.NumberGoals]
+        )
+            .subscribe(state => {
+                setUser(state[0]);
+                setGoalOverviews(state[1]);
+                setHabitGoals(state[2]);
+                setListGoals(state[3]);
+                setNumberGoals(state[4]);
+            })
+
+        goalService
+            .loadUserGoals(match.params.username)
+            .subscribe(() => setLoading(false));
+    }, [match.params.username])
+
+    const profilePic = buildProfilePic();
+    const header = buildHeader(profilePic);
+    const goals = buildGoals();
+
+    if (loading) {
+        return (
+            <div>
+                {header}
+            </div>
+        );
+    }
+
+    return (
+        <div>
+            {header}
+
+            <section className="section">
+                <div className="container has-text-centered">
+
+                    <h2 className="title is-2">Goals</h2>
+                    <Overview goals={goalOverviews.map(g => g.Name)}
+                              status={goalOverviews.map(g => `${+(g.Progress / g.Target).toFixed(2)}%`)}/>
+
+                    {goals.habitGoals}
+
+                    <div className="columns">
+                        {goals.listGoals}
+                    </div>
+
+                    {goals.numberGoals}
+                </div>
+            </section>
+        </div>
+    );
+}
+
+export default Profile;
