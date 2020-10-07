@@ -4,7 +4,7 @@ import {ListGoal, Progress} from "../../models/ListGoal";
 import {NumberGoal} from "../../models/NumberGoal";
 import './AdminBox.css';
 import HttpClient from "../../clients/HttpClient";
-import {CurrentUserContext} from "../../App";
+import {AuthenticationContext} from "../../context/AuthenticationContext";
 
 interface Props {
     showCreateModal: Function;
@@ -14,6 +14,8 @@ interface Props {
 }
 
 const AdminBox: React.FC<Props> = (props) => {
+    const {isAuthenticated, currentUser} = useContext(AuthenticationContext);
+
     const [habitGoals, setHabitGoals] = useState([] as HabitGoal[]);
     const [listGoals, setListGoals] = useState([] as ListGoal[]);
     const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
@@ -21,17 +23,16 @@ const AdminBox: React.FC<Props> = (props) => {
 
     const {showCreateModal, logHabitModal, logListModal, logNumberModal} = props;
 
-    const currentUser = useContext(CurrentUserContext);
-    const httpClient = new HttpClient();
-
     useEffect(() => {
-        if (!currentUser.Username) {
+        const httpClient = new HttpClient();
+
+        if (!isAuthenticated) {
             return
         }
 
-        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${currentUser.Username}`);
-        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${currentUser.Username}`);
-        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${currentUser.Username}`);
+        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${currentUser.email}`);
+        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${currentUser.email}`);
+        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${currentUser.email}`);
 
         Promise.all([habits, lists, numbers])
             .then(values => {
@@ -40,29 +41,37 @@ const AdminBox: React.FC<Props> = (props) => {
                 setNumberGoals(values[2]);
                 setLoading(false);
             });
-    }, [currentUser])
+    }, [currentUser, isAuthenticated])
 
     if (loading) {
         return <></>;
     }
 
     const loadGoalRows = (): JSX.Element[] => {
+        const httpClient = new HttpClient();
+
         let goalRows: JSX.Element[] = [];
 
-        habitGoals.forEach(g => {
-            const progress = g.Logs.filter(l => l.HabitCompleted).length;
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logHabitModal(g), () => httpClient.delete(`/api/HabitGoal/${g.HabitGoalId}`)));
-        });
+        if (habitGoals) {
+            habitGoals.forEach(g => {
+                const progress = g.Logs.filter(l => l.HabitCompleted).length;
+                goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logHabitModal(g), () => httpClient.delete(`/api/HabitGoal/${g.HabitGoalId}`)));
+            });
+        }
 
-        listGoals.forEach(g => {
-            const progress = g.Items.filter(i => i.Progress === Progress.Completed).length;
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logListModal(g), () => httpClient.delete(`/api/ListGoal/${g.ListGoalId}`)));
-        });
+        if (listGoals) {
+            listGoals.forEach(g => {
+                const progress = g.Items.filter(i => i.Progress === Progress.Completed).length;
+                goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logListModal(g), () => httpClient.delete(`/api/ListGoal/${g.ListGoalId}`)));
+            });
+        }
 
-        numberGoals.forEach(g => {
-            const progress = g.Logs.map(l => l.Amount).reduce((a, b) => a + b, 0);
-            goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logNumberModal(g), () => httpClient.delete(`/api/NumberGoal/${g.NumberGoalId}`)));
-        });
+        if (numberGoals) {
+            numberGoals.forEach(g => {
+                const progress = g.Logs.map(l => l.Amount).reduce((a, b) => a + b, 0);
+                goalRows.push(createGoalRow(g.Name, progress, g.Target, () => logNumberModal(g), () => httpClient.delete(`/api/NumberGoal/${g.NumberGoalId}`)));
+            });
+        }
 
         return goalRows;
     }
@@ -85,7 +94,11 @@ const AdminBox: React.FC<Props> = (props) => {
     }
 
     const userHasGoals = (): boolean => {
-        return habitGoals.length !== 0 || listGoals.length !== 0 || numberGoals.length !== 0;
+        const hasHabits = habitGoals && habitGoals.length !== 0;
+        const hasLists = listGoals && listGoals.length !== 0;
+        const hasNumbers = numberGoals && numberGoals.length !== 0;
+
+        return hasHabits || hasLists || hasNumbers;
     }
 
     const adminGoalRows = loadGoalRows();
@@ -104,14 +117,14 @@ const AdminBox: React.FC<Props> = (props) => {
                 </div>
                 {userHasGoals() &&
                 <table className="table is-bordered is-fullwidth">
-                    <thead>
-                    <tr>
-                        <th colSpan={4}>Your Goals</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {adminGoalRows}
-                    </tbody>
+                  <thead>
+                  <tr>
+                    <th colSpan={4}>Your Goals</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  {adminGoalRows}
+                  </tbody>
                 </table>
                 }
             </div>

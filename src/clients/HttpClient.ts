@@ -10,7 +10,11 @@ export default class HttpClient {
     get<T>(url: string): Promise<T> {
         return fetch(config.api_url + url, {
             mode: 'cors',
-            headers: {'Access-Control-Allow-Origin': '*', 'Authorization': `Bearer ${this._token}`}
+            credentials: 'include',
+            headers: {
+                'Access-Control-Allow-Origin': '*',
+                'Content-Type': 'application/json',
+            }
         })
             .then(function (response) {
                 if (response.status !== 200) {

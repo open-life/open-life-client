@@ -6,9 +6,8 @@ import AdminBox from '../../components/Admin/AdminBox';
 import {HabitGoal} from '../../models/HabitGoal';
 import {ListGoal} from '../../models/ListGoal';
 import {NumberGoal} from '../../models/NumberGoal';
-import {useAuth0} from "@auth0/auth0-react";
 import HttpClient from "../../clients/HttpClient";
-import User from "../../models/User";
+import {AuthenticationContext} from "../../context/AuthenticationContext";
 
 interface Props {
     showCreateModal: Function;
@@ -18,28 +17,38 @@ interface Props {
 }
 
 const Home: React.FC<Props> = (props) => {
-    const {isAuthenticated} = useAuth0();
+    const {isAuthenticated} = useContext(AuthenticationContext);
 
     const [userBoxes, setUserBoxes] = useState([] as JSX.Element[]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadUserBoxers = async () => {
-            let httpClient = new HttpClient();
-            let userBoxes: JSX.Element[] = [];
-            let users = await httpClient.get<User[]>(`/api/User/`);
+        let httpClient = new HttpClient();
+        let userBoxes: JSX.Element[] = [];
+        httpClient.get<GoalOverview[]>("/api/Goals").then(overviews => {
+            if (!overviews) {
+                return;
+            }
 
-            await Promise.all(users.map(async (user) => {
-                const overviews = await httpClient.get<GoalOverview[]>(`/api/Goals/${user.Username}`);
-                userBoxes.push(<UserBox key={user.UserId} user={user} userGoals={overviews}/>);
+            let overviewsByUser = new Map<string, GoalOverview[]>();
+            overviews.forEach(overview => {
+                if (!overviewsByUser.get(overview.UserId)) {
+                    overviewsByUser.set(overview.UserId, []);
+                }
+
+                let newValue = overviewsByUser.get(overview.UserId) || [];
+                newValue.push(overview);
+                overviewsByUser.set(overview.UserId, newValue);
+            })
+
+            overviewsByUser.forEach(((value, key) => {
+                userBoxes.push(<UserBox userId={key} userGoals={value}/>);
             }))
 
             setUserBoxes(userBoxes);
             setLoading(false);
-        }
-
-        loadUserBoxers()
-    }, [])
+        });
+    }, [isAuthenticated])
 
     const {showCreateModal, logHabitModal, logListModal, logNumberModal} = props;
 

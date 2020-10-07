@@ -6,15 +6,14 @@ import {NumberGoal} from "../models/NumberGoal";
 import Input from "../components/Input";
 import {ListGoal} from "../models/ListGoal";
 import HttpClient from "../clients/HttpClient";
-import {CurrentUserContext} from "../App";
+import {AuthenticationContext} from "../context/AuthenticationContext";
 
 interface Props {
     closeModal: Function;
 }
 
 const CreateGoal: React.FC<Props> = (props) => {
-    const currentUser = useContext(CurrentUserContext);
-    const httpClient = new HttpClient();
+    const {currentUser} = useContext(AuthenticationContext);
 
     const [goalType, setGoalType] = useState('Habit');
     const [name, setName] = useState('');
@@ -24,6 +23,8 @@ const CreateGoal: React.FC<Props> = (props) => {
     const [listName, setListName] = useState('');
 
     const {closeModal} = props;
+
+    const httpClient = new HttpClient();
 
     const resetModal = () => {
         setGoalType('Habit');
@@ -37,21 +38,21 @@ const CreateGoal: React.FC<Props> = (props) => {
     const saveGoal = () => {
         switch (goalType) {
             case 'Habit':
-                httpClient.post<HabitGoal>('/api/HabitGoal', new HabitGoal(name, startDate, endDate, currentUser.UserId))
+                httpClient.post<HabitGoal>('/api/HabitGoal', new HabitGoal(name, startDate, endDate, currentUser.email))
                     .then(() => {
                         closeModal();
                         resetModal();
                     });
                 break;
             case 'Number':
-                httpClient.post<NumberGoal>('/api/NumberGoal', new NumberGoal(name, startDate, endDate, goalAmount, currentUser.UserId))
+                httpClient.post<NumberGoal>('/api/NumberGoal', new NumberGoal(name, startDate, endDate, goalAmount, currentUser.email))
                     .then(() => {
                         closeModal();
                         resetModal();
                     });
                 break;
             case 'List':
-                httpClient.post<ListGoal>('/api/ListGoal', new ListGoal(name, listName, startDate, endDate, goalAmount, currentUser.UserId))
+                httpClient.post<ListGoal>('/api/ListGoal', new ListGoal(name, listName, startDate, endDate, goalAmount, currentUser.email))
                     .then(() => {
                         closeModal();
                         resetModal();

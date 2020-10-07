@@ -1,4 +1,4 @@
-import React, {ChangeEvent, useContext, useEffect, useState} from 'react';
+import React, {ChangeEvent, useEffect, useState} from 'react';
 import './Profile.css';
 import Overview from '../../components/Goals/Overview/Overview';
 import DailyTracker from '../../components/Goals/DailyTracker/DailyTracker';
@@ -27,10 +27,8 @@ const Profile: React.FC<Props> = (props) => {
     const [listGoals, setListGoals] = useState([] as ListGoal[]);
     const [numberGoals, setNumberGoals] = useState([] as NumberGoal[]);
 
-    const httpClient = new HttpClient();
-
     const buildProfilePic = (): JSX.Element => {
-        if (user && (user.ImageUrl === '' || !user.ImageUrl)) {
+        if (user && (user.photoUrl === '' || !user.photoUrl)) {
             return (
                 <div className="add-avatar-image" onClick={() => uploadProfilePic()}>
                     <input id="fileInput" type="file" ref={profilePicUpload} style={{display: 'none'}}
@@ -41,7 +39,7 @@ const Profile: React.FC<Props> = (props) => {
                 </div>
             );
         } else {
-            return <img alt="Profile Pic" className="is-rounded avatar-image" src={user.ImageUrl}/>;
+            return <img alt="Profile Pic" className="is-rounded avatar-image" src={user.photoUrl}/>;
         }
     }
 
@@ -74,12 +72,10 @@ const Profile: React.FC<Props> = (props) => {
                         {profilePic}
                     </figure>
                     <div className="name-stats">
-                        <h2 className="is-size-2 has-text-white name">{user.Name}</h2>
-                        {goalOverviews.length !== 0 &&
+                        <h2 className="is-size-2 has-text-white name">{user.displayName}</h2>
                         <div className="stats">
-                            <h2 className="is-size-2 has-text-white goals">{goalOverviews.length} goals</h2>
+                            <h2 className="is-size-2 has-text-white goals">{goalOverviews ? goalOverviews.length : 0} goals</h2>
                         </div>
-                        }
                     </div>
                 </section>
             </header>
@@ -92,37 +88,48 @@ const Profile: React.FC<Props> = (props) => {
         numberGoals: JSX.Element[]
     } => {
         let habitGoalElements: JSX.Element[] = [];
-        habitGoals.forEach(g => {
-            habitGoalElements.push(<DailyTracker key={g.HabitGoalId} goal={g}/>);
-        });
+        if (habitGoals) {
+            habitGoals.forEach(g => {
+                habitGoalElements.push(<DailyTracker key={g.HabitGoalId} goal={g}/>);
+            });
+        }
 
         let listGoalElements: JSX.Element[] = [];
-        listGoals.forEach(g => {
-            listGoalElements.push(<div key={g.ListGoalId} className="column is-half"><List goal={g}/></div>);
-        });
+        if (listGoals) {
+            listGoals.forEach(g => {
+                listGoalElements.push(<div key={g.ListGoalId} className="column is-half"><List goal={g}/></div>);
+            });
+        }
 
         let numberGoalElements: JSX.Element[] = [];
-        numberGoals.forEach(g => {
-            numberGoalElements.push(<Chart key={g.NumberGoalId} goal={g}/>);
-        });
+        if (numberGoals) {
+            numberGoals.forEach(g => {
+                numberGoalElements.push(<Chart key={g.NumberGoalId} goal={g}/>);
+            });
+        }
 
         return {habitGoals: habitGoalElements, listGoals: listGoalElements, numberGoals: numberGoalElements};
     }
 
     useEffect(() => {
-        httpClient.get<User>(`/api/User/username/${match.params.username}`)
-            .then(user => setUser(user))
+        const httpClient = new HttpClient();
+
+        httpClient.get<User>(`/users/${match.params.id}`).then(user => {
+            setUser(user);
+        })
     }, [match])
 
     useEffect(() => {
-        if(!user || !user.Username){
+        if (!user.id) {
             return
         }
 
-        const overviews = httpClient.get<GoalOverview[]>(`/api/Goals/${user.Username}`);
-        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${user.Username}`);
-        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${user.Username}`);
-        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${user.Username}`);
+        const httpClient = new HttpClient();
+
+        const overviews = httpClient.get<GoalOverview[]>(`/api/Goals/${user.id}`);
+        const habits = httpClient.get<HabitGoal[]>(`/api/HabitGoal/${user.id}`);
+        const lists = httpClient.get<ListGoal[]>(`/api/ListGoal/${user.id}`);
+        const numbers = httpClient.get<NumberGoal[]>(`/api/NumberGoal/${user.id}`);
 
         Promise.all([overviews, habits, lists, numbers])
             .then(values => {
@@ -150,8 +157,9 @@ const Profile: React.FC<Props> = (props) => {
                 <div className="container has-text-centered">
 
                     <h2 className="title is-2">Goals</h2>
+                    {goalOverviews &&
                     <Overview goals={goalOverviews.map(g => g.Name)}
-                              status={goalOverviews.map(g => `${+(g.Progress / g.Target).toFixed(2)}%`)}/>
+                              status={goalOverviews.map(g => `${+(g.Progress / g.Target).toFixed(2)}%`)}/>}
 
                     {goals.habitGoals}
 

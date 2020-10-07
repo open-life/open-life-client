@@ -1,12 +1,14 @@
 import React, {useContext} from 'react';
 import {Link} from 'react-router-dom';
 import './NavBar.css';
-import {useAuth0} from "@auth0/auth0-react";
-import {CurrentUserContext} from "../../App";
+import {AuthenticationContext} from "../../context/AuthenticationContext";
 
 const NavBar: React.FC = () => {
-    const {isAuthenticated, loginWithRedirect, logout} = useAuth0();
-    const currentUser = useContext(CurrentUserContext);
+    const {isAuthenticated, currentUser} = useContext(AuthenticationContext);
+
+    const login = () => {
+        window.open('http://localhost:5000/auth/google', "_self");
+    }
 
     return (
         <nav className="navbar" role="navigation" aria-label="main navigation">
@@ -26,23 +28,23 @@ const NavBar: React.FC = () => {
             {
                 isAuthenticated &&
                 <div id="navbarBasicExample" className="navbar-menu">
-                    <div className="navbar-start">
-                        <Link className="navbar-item" to="/">Home</Link>
-                        {currentUser && currentUser.Username &&
-                        <Link className="navbar-item" to={`/${currentUser.Username}`}>Profile</Link>}
-                        <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new"
-                           target="_blank" rel="noopener noreferrer">Provide Feedback</a>
-                    </div>
+                  <div className="navbar-start">
+                    <Link className="navbar-item" to="/">Home</Link>
+                      {isAuthenticated &&
+                      <Link className="navbar-item" to={`/${currentUser.providerId}`}>Profile</Link>}
+                    <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new"
+                       target="_blank" rel="noopener noreferrer">Provide Feedback</a>
+                  </div>
                 </div>
             }
 
             {
                 !isAuthenticated &&
                 <div id="navbarBasicExample" className="navbar-menu">
-                    <div className="navbar-start">
-                        <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new"
-                           target="_blank" rel="noopener noreferrer">Provide Feedback</a>
-                    </div>
+                  <div className="navbar-start">
+                    <a className="navbar-item" href="http://issues.myopen.life/projects/open-life/issues/new"
+                       target="_blank" rel="noopener noreferrer">Provide Feedback</a>
+                  </div>
                 </div>
             }
 
@@ -50,15 +52,15 @@ const NavBar: React.FC = () => {
                 <div className="navbar-item">
                     {!isAuthenticated && (
                         <div className="buttons">
-                                <span className="button is-primary" onClick={() => loginWithRedirect()}>
-                                    <strong>Sign up</strong>
-                                </span>
+                            <button className="button is-primary" onClick={() => login()}>
+                                <strong>Sign up</strong>
+                            </button>
                             <span className="button is-light"
-                                  onClick={() => loginWithRedirect()}>Log in</span>
+                                  onClick={() => login()}>Log in</span>
                         </div>
                     )}
                     {isAuthenticated &&
-                    <div className="buttons"><span onClick={() => logout()} className="button is-light">Log out</span>
+                    <div className="buttons"><span className="button is-light">Log out</span>
                     </div>}
                 </div>
             </div>

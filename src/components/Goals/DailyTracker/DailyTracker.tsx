@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React from 'react';
 import SVG from 'svg.js';
 import {HabitGoal} from '../../../models/HabitGoal';
 
@@ -8,11 +8,6 @@ interface DailyTrackerProps {
 
 const DailyTracker: React.FC<DailyTrackerProps> = (props) => {
     const {goal} = props;
-
-    useEffect(() => {
-        const daysArray = buildDaysArray(goal);
-        dailyTracker(daysArray);
-    }, [goal])
 
     const buildDaysArray = (goal: HabitGoal): number[] => {
         let days: number[] = [];
@@ -70,6 +65,9 @@ const DailyTracker: React.FC<DailyTrackerProps> = (props) => {
 
         draw.height(y + 23);
     }
+
+    const daysArray = buildDaysArray(goal);
+    dailyTracker(daysArray);
 
     return (
         <div className="box">
